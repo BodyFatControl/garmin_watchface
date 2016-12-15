@@ -2,18 +2,42 @@ using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 using Toybox.Lang as Lang;
+//using Toybox.UserProfile as User;
+using Toybox.Communications as Comm;
+using Toybox.Timer as Timer;
 
-class DWFC_garmin_watchfaceView extends Ui.WatchFace {
+var strings = ["","","","",""];
+var stringsSize = 5;
+var mailMethod;
+var crashOnMessage = false;
+var timer1;
+
+class DFC_garmin_watchappView extends Ui.WatchFace {
     var isAwake = false;
     const displayHeightOffset = 57;
 
+//    var bmr;
+//    var userProfile = Toybox.UserProfile.getProfile();
+
     function initialize() {
         WatchFace.initialize();
+
+        mailMethod = method(:onMail);
+        Comm.setMailboxListener(mailMethod);
+    }
+
+    // Update UI at frequency of timer
+    function timerCallback() {
+        Ui.requestUpdate();
     }
 
     // Load your resources here
     function onLayout(dc) {
         setLayout(Rez.Layouts.WatchFace(dc));
+
+        timer1 = new Timer.Timer();
+        // every 5000ms = 5s
+        timer1.start(method(:timerCallback), 5000, true);
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -21,6 +45,16 @@ class DWFC_garmin_watchfaceView extends Ui.WatchFace {
     // loading resources into memory.
     function onShow() {
     }
+
+//    calcBMR() {
+//	    val bmr;
+//	    var clockTime = Sys.getClockTime();
+//	    var userAge = clockTime.timeZoneOffset
+//
+//	    if (userProfile.gender == user.Profile.GENDER_MALE) {
+//		    bmr = 66 + (13.7 * (userProfile.weight/1000)) + (5 x userProfile.height) - (6.8 x userProfile.birthYear)
+//	    }
+//    }
 
     function drawHoursHand(dc, angle) {
 	// Map out the coordinates of the watch hand
@@ -120,6 +154,9 @@ class DWFC_garmin_watchfaceView extends Ui.WatchFace {
 
     // Update the view
     function onUpdate(dc) {
+	Comm.setMailboxListener(mailMethod);
+	var listener = new CommListener();
+
 	var font = Graphics.FONT_LARGE;
 	var width;
 	var height;
@@ -131,8 +168,6 @@ class DWFC_garmin_watchfaceView extends Ui.WatchFace {
 
 	width = dc.getWidth();
 	height = dc.getHeight() - displayHeightOffset;
-
-	var now = Time.now();
 
 	// Clear the screen
 	dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
@@ -174,6 +209,11 @@ class DWFC_garmin_watchfaceView extends Ui.WatchFace {
 	dc.fillCircle(width / 2, height / 2, 5);
 	dc.setColor(Gfx.COLOR_BLACK,Gfx.COLOR_BLACK);
 	dc.drawCircle(width / 2, height / 2, 5);
+
+	// Send the seconds
+	Comm.transmit(clockTime.sec, null, listener);
+
+	System.println(clockTime.sec);
     }
 
     // Called when this View is removed from the screen. Save the
@@ -189,6 +229,40 @@ class DWFC_garmin_watchfaceView extends Ui.WatchFace {
 
     function onExitSleep() {
 	isAwake = true;
+	timer1.stop();
     }
 
+    function onMail(mailIter) {
+////	var mail;
+////
+////	mail = mailIter.next();
+////
+////	while(mail != null) {
+////	    var i;
+////	    for(i = (stringsSize - 1); i > 0; i -= 1) {
+////	       strings[i] = strings[i-1];
+////	    }
+////
+////	    strings[0] = mail.toString();
+////	    page = 1;
+////	    mail = mailIter.next();
+////	}
+
+	Comm.emptyMailbox();
+////    Ui.requestUpdate();
+    }
+}
+
+class CommListener extends Comm.ConnectionListener {
+    function initialize() {
+        Comm.ConnectionListener.initialize();
+    }
+
+    function onComplete() {
+//        Sys.println("Transmit Complete");
+    }
+
+    function onError() {
+//        Sys.println("Transmit Failed");
+    }
 }
