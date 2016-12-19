@@ -2,18 +2,34 @@ using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
 using Toybox.Lang as Lang;
+using Toybox.Communications as Comm;
+using Toybox.Timer as Timer;
 
-class DWFC_garmin_watchfaceView extends Ui.WatchFace {
+var mailMethod;
+var timer1 = new Timer.Timer();
+
+class DFC_garmin_watchappView extends Ui.WatchFace {
     var isAwake = false;
     const displayHeightOffset = 57;
 
     function initialize() {
         WatchFace.initialize();
+
+        mailMethod = method(:onMail);
+        Comm.setMailboxListener(mailMethod);
+    }
+
+    // Update UI at frequency of timer
+    function timerCallback() {
+        Ui.requestUpdate();
     }
 
     // Load your resources here
     function onLayout(dc) {
         setLayout(Rez.Layouts.WatchFace(dc));
+
+    // timer runs at every 1 minute
+    timer1.start(method(:timerCallback), 60000, true);
     }
 
     // Called when this View is brought to the foreground. Restore
@@ -117,7 +133,6 @@ class DWFC_garmin_watchfaceView extends Ui.WatchFace {
 	}
      }
 
-
     // Update the view
     function onUpdate(dc) {
 	var font = Graphics.FONT_LARGE;
@@ -129,9 +144,14 @@ class DWFC_garmin_watchfaceView extends Ui.WatchFace {
 	var minuteHandAngle;
 	var secondHandAngle;
 
+	Comm.setMailboxListener(mailMethod);
+	var listener = new CommListener();
+
 	width = dc.getWidth();
 	height = dc.getHeight() - displayHeightOffset;
-
+	    // timer runs at every 1 minute
+	    timer1.stop();
+	    timer1.start(method(:timerCallback), 1000, true);
 	var now = Time.now();
 
 	// Clear the screen
@@ -183,12 +203,35 @@ class DWFC_garmin_watchfaceView extends Ui.WatchFace {
     }
 
     function onEnterSleep() {
+	// timer runs at every 1 minute
+	timer1.start(method(:timerCallback), 60000, true);
 	isAwake = false;
 	Ui.requestUpdate();
     }
 
     function onExitSleep() {
+	// timer runs at every 1 second
+	timer1.start(method(:timerCallback), 1000, true);
 	isAwake = true;
+	Ui.requestUpdate();
     }
 
+    // Receive here the data sent from the Android app
+    function onMail(mailIter) {
+	Comm.emptyMailbox();
+    }
+}
+
+class CommListener extends Comm.ConnectionListener {
+    function initialize() {
+        Comm.ConnectionListener.initialize();
+    }
+
+    // Sucess to send data to Android app
+    function onComplete() {
+    }
+
+    // Fail to send data to Android app
+    function onError() {
+    }
 }
