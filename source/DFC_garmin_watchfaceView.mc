@@ -16,30 +16,24 @@ var clockTime = Sys.getClockTime();
 const HISTORIC_HR_COMMAND = 0xFFFFA000;
 const USER_DATA_COMMAND = 0xFFFF0B00;
 
-class DFC_garmin_watchappView extends Ui.WatchFace {
+class DFC_garmin_watchappView extends Ui.View {
     var isAwake = false;
     const displayHeightOffset = 57;
 
     function initialize() {
-        WatchFace.initialize();
+	View.initialize();
 
         mailMethod = method(:onMail);
         Comm.setMailboxListener(mailMethod);
     }
 
-    // Update UI at frequency of timer
-    function timerCallback() {
-        Ui.requestUpdate();
-
-        var duration = new Time.Duration(60*60);
-        System.println("duration " + duration.value());
-
+    function sendHR() {
+	Comm.setMailboxListener(mailMethod);
+	var listener = new CommListener();
 
 	var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
 	    {
-//		:period => (Time.now().value() - 2), /* 1h */
-//		:period => duration.value(),
-		:period => 30*60,
+		:period => 10,
 		:order => SensorHistory.ORDER_NEWEST_FIRST
 	    });
 
@@ -60,8 +54,15 @@ class DFC_garmin_watchappView extends Ui.WatchFace {
 	System.println("timeNow " + Time.now().value());
 	System.println("dataArray " + dataArray);
 
-//	// Transmit command response
-//	Comm.transmit(dataArray, null, listener);
+	// Transmit command response
+	Comm.transmit(dataArray, null, listener);
+    }
+
+    // Update UI at frequency of timer
+    function timerCallback() {
+        Ui.requestUpdate();
+
+        sendHR();
     }
 
     // Load your resources here
@@ -84,9 +85,6 @@ class DFC_garmin_watchappView extends Ui.WatchFace {
 	var height;
 	var clockTime = Sys.getClockTime();
 
-	Comm.setMailboxListener(mailMethod);
-	var listener = new CommListener();
-
 	width = dc.getWidth();
 	height = dc.getHeight();
 
@@ -105,12 +103,6 @@ class DFC_garmin_watchappView extends Ui.WatchFace {
     function onHide() {
     }
 
-    function onEnterSleep() {
-    }
-
-    function onExitSleep() {
-    }
-
     // Receive here the data sent from the Android app
     function onMail(mailIter) {
 	Comm.emptyMailbox();
@@ -124,11 +116,39 @@ class CommListener extends Comm.ConnectionListener {
 
     // Sucess to send data to Android app
     function onComplete() {
-	System.println("send ok " + Time.now());
+	System.println("send ok " + Time.now().value());
     }
 
     // Fail to send data to Android app
     function onError() {
-	System.println("send er " + Time.now());
+	System.println("send er " + Time.now().value());
     }
 }
+
+
+Copying file.... 94% complete
+Copying file.... 97% complete
+Copying file.... 99% complete
+Copying file.... 100% complete
+File pushed successfully
+Connection Finished
+Closing shell and port
+Found Transport: tcp
+Connecting...
+Connecting to device...
+Device Version 0.1.0
+Device id 1 name "A garmin device"
+Shell Version 0.1.0
+timeNow 1482242743
+dataArray [-24576, -24576, 1482242743, 80, 1482242676, null, 1482242609, 84, 1482242542, 81, 1482242475, 76, 1482242408, 75, 1482242341, 79, 1482242274, 83, 1482242207, 85, 1482242140, 82]
+send er 1482242747
+timeNow 1482242748
+dataArray [-24576, -24576, 1482242743, 80, 1482242676, null, 1482242609, 84, 1482242542, 81, 1482242475, 76, 1482242408, 75, 1482242341, 79, 1482242274, 83, 1482242207, 85, 1482242140, 82]
+send er 1482242749
+timeNow 1482242753
+dataArray [-24576, -24576, 1482242743, 80, 1482242676, null, 1482242609, 84, 1482242542, 81, 1482242475, 76, 1482242408, 75, 1482242341, 79, 1482242274, 83, 1482242207, 85, 1482242140, 82]
+send er 1482242755
+Complete
+Connection Finished
+Closing shell and port
+
