@@ -17,6 +17,11 @@ var clockTime = Sys.getClockTime();
 const HISTORIC_HR_COMMAND = 104030201;
 const USER_DATA_COMMAND = 204030201;
 
+// Seems a Garmin bug, because UTC time is UTC 00:00 Dec 31 1989
+//Unix UTC time: 1 January 1970
+//Garmin UTC time: 31 December 1989
+const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Time.Gregorian.SECONDS_PER_DAY;
+
 class DFC_garmin_watchappView extends Ui.View {
     var isAwake = false;
     const displayHeightOffset = 57;
@@ -31,8 +36,6 @@ class DFC_garmin_watchappView extends Ui.View {
     // Update UI at frequency of timer
     function timerCallback() {
         Ui.requestUpdate();
-
-//        sendHR();
     }
 
     // Load your resources here
@@ -91,30 +94,30 @@ class DFC_garmin_watchappView extends Ui.View {
 
 	// Execute command
 	if (command == HISTORIC_HR_COMMAND) {
-//	    // Get the parameters from the command
-//	    var random_id = mailIter.next();
-//	    var interval = mailIter.next(); // interval in minutes
-//	    var HRSensorHistoryIterator = SensorHistory.getHeaUSER_DATA_COMMANDrtRateHistory(
-//		{
-//		    :period => duration,
-//		    :order => SensorHistory.ORDER_NEWEST_FIRST
-//		});
-//
-//	    var when = HRSensorHistoryIterator.next().when();
-//	    var hrValue = HRSensorHistoryIterator.next().data();
-//
-//
-//	    // Starting building the command response
-//	    dataArray.add(HISTORIC_HR_COMMAND);
-//	    dataArray.add(random_id);
-//
-//	    while (hrValue != null) {
-//		dataArray.add(when);
-//		dataArray.add(hrValue);
-//
-//		var when = HRSensorHistoryIterator.next().when();
-//		var hrValue = HRSensorHistoryIterator.next().data();
-//	    }
+	    var startDate = mail[2];
+	    var date;
+
+	    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
+		{
+		//Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
+		    //:period => new Toybox.Time.Duration.initialize(5*60)
+		    :order => SensorHistory.ORDER_NEWEST_FIRST
+		});
+
+	    var HRSample = HRSensorHistoryIterator.next();
+	    // Starting building the command response
+	    dataArray.add(HISTORIC_HR_COMMAND);
+	    dataArray.add(mail[1]); // send back the random ID
+	    while (HRSample != null) {
+		date = HRSample.when.value() + GARMIN_UTC_OFFSET;
+		if (date > startDate) {
+		  dataArray.add(date);
+		  dataArray.add(HRSample.data);
+		  HRSample = HRSensorHistoryIterator.next();
+		} else {
+		    break;
+		}
+	    }
 	} else if (command == USER_DATA_COMMAND) {
 
 	    // Get the parameters from the command
@@ -122,7 +125,6 @@ class DFC_garmin_watchappView extends Ui.View {
 	    // Starting building the command response
 	    dataArray.add(USER_DATA_COMMAND);
 	    dataArray.add(mail[1]); // send back the random ID
-
 	    dataArray.add(userProfile.birthYear);
 	    dataArray.add(userProfile.gender);
 	    dataArray.add(userProfile.height);
