@@ -7,14 +7,15 @@ using Toybox.Timer as Timer;
 using Toybox.ActivityMonitor as ActivityMonitor;
 using Toybox.SensorHistory as SensorHistory;
 using Toybox.Time as Time;
+using Toybox.UserProfile as UserProfile;
 
 var mailMethod;
 var timer1 = new Timer.Timer();
 
 var clockTime = Sys.getClockTime();
 
-const HISTORIC_HR_COMMAND = 0xFFFFA000;
-const USER_DATA_COMMAND = 0xFFFF0B00;
+const HISTORIC_HR_COMMAND = 104030201;
+const USER_DATA_COMMAND = 204030201;
 
 class DFC_garmin_watchappView extends Ui.View {
     var isAwake = false;
@@ -27,42 +28,11 @@ class DFC_garmin_watchappView extends Ui.View {
         Comm.setMailboxListener(mailMethod);
     }
 
-    function sendHR() {
-	Comm.setMailboxListener(mailMethod);
-	var listener = new CommListener();
-
-	var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
-	    {
-		:period => 10,
-		:order => SensorHistory.ORDER_NEWEST_FIRST
-	    });
-
-	var HRSample = HRSensorHistoryIterator.next();
-	var dataArray = []; // array size will be increased as needed using .add()
-
-	// Starting building the command response
-	dataArray.add(HISTORIC_HR_COMMAND);
-	dataArray.add(HISTORIC_HR_COMMAND);
-	while (HRSample != null) {
-
-	    dataArray.add(HRSample.when.value());
-	    dataArray.add(HRSample.data);
-
-	    HRSample = HRSensorHistoryIterator.next();
-	}
-
-	System.println("timeNow " + Time.now().value());
-	System.println("dataArray " + dataArray);
-
-	// Transmit command response
-	Comm.transmit(dataArray, null, listener);
-    }
-
     // Update UI at frequency of timer
     function timerCallback() {
         Ui.requestUpdate();
 
-        sendHR();
+//        sendHR();
     }
 
     // Load your resources here
@@ -105,6 +75,63 @@ class DFC_garmin_watchappView extends Ui.View {
 
     // Receive here the data sent from the Android app
     function onMail(mailIter) {
+	var listener = new CommListener();
+	var mail;
+	var dataArray = [];
+	var command = 0;
+
+	mail = mailIter.next();
+
+	// Identify command
+	if (mail[0] == HISTORIC_HR_COMMAND) {
+	    command = HISTORIC_HR_COMMAND;
+	} else if (mail[0] == USER_DATA_COMMAND) {
+	    command = USER_DATA_COMMAND;
+	}
+
+	// Execute command
+	if (command == HISTORIC_HR_COMMAND) {
+//	    // Get the parameters from the command
+//	    var random_id = mailIter.next();
+//	    var interval = mailIter.next(); // interval in minutes
+//	    var HRSensorHistoryIterator = SensorHistory.getHeaUSER_DATA_COMMANDrtRateHistory(
+//		{
+//		    :period => duration,
+//		    :order => SensorHistory.ORDER_NEWEST_FIRST
+//		});
+//
+//	    var when = HRSensorHistoryIterator.next().when();
+//	    var hrValue = HRSensorHistoryIterator.next().data();
+//
+//
+//	    // Starting building the command response
+//	    dataArray.add(HISTORIC_HR_COMMAND);
+//	    dataArray.add(random_id);
+//
+//	    while (hrValue != null) {
+//		dataArray.add(when);
+//		dataArray.add(hrValue);
+//
+//		var when = HRSensorHistoryIterator.next().when();
+//		var hrValue = HRSensorHistoryIterator.next().data();
+//	    }
+	} else if (command == USER_DATA_COMMAND) {
+
+	    // Get the parameters from the command
+	    var userProfile = UserProfile.getProfile();
+	    // Starting building the command response
+	    dataArray.add(USER_DATA_COMMAND);
+	    dataArray.add(mail[1]); // send back the random ID
+
+	    dataArray.add(userProfile.birthYear);
+	    dataArray.add(userProfile.gender);
+	    dataArray.add(userProfile.height);
+	    dataArray.add(userProfile.weight);
+	    dataArray.add(userProfile.activityClass);
+	}
+
+	// Transmit command response
+	Comm.transmit(dataArray, null, listener);
 	Comm.emptyMailbox();
     }
 }
@@ -116,39 +143,13 @@ class CommListener extends Comm.ConnectionListener {
 
     // Sucess to send data to Android app
     function onComplete() {
-	System.println("send ok " + Time.now().value());
+//	System.println("send ok " + Time.now().value());
     }
 
     // Fail to send data to Android app
     function onError() {
-	System.println("send er " + Time.now().value());
+//	System.println("send er " + Time.now().value());
     }
 }
 
-
-Copying file.... 94% complete
-Copying file.... 97% complete
-Copying file.... 99% complete
-Copying file.... 100% complete
-File pushed successfully
-Connection Finished
-Closing shell and port
-Found Transport: tcp
-Connecting...
-Connecting to device...
-Device Version 0.1.0
-Device id 1 name "A garmin device"
-Shell Version 0.1.0
-timeNow 1482242743
-dataArray [-24576, -24576, 1482242743, 80, 1482242676, null, 1482242609, 84, 1482242542, 81, 1482242475, 76, 1482242408, 75, 1482242341, 79, 1482242274, 83, 1482242207, 85, 1482242140, 82]
-send er 1482242747
-timeNow 1482242748
-dataArray [-24576, -24576, 1482242743, 80, 1482242676, null, 1482242609, 84, 1482242542, 81, 1482242475, 76, 1482242408, 75, 1482242341, 79, 1482242274, 83, 1482242207, 85, 1482242140, 82]
-send er 1482242749
-timeNow 1482242753
-dataArray [-24576, -24576, 1482242743, 80, 1482242676, null, 1482242609, 84, 1482242542, 81, 1482242475, 76, 1482242408, 75, 1482242341, 79, 1482242274, 83, 1482242207, 85, 1482242140, 82]
-send er 1482242755
-Complete
-Connection Finished
-Closing shell and port
 
