@@ -17,6 +17,12 @@ var clockTime = Sys.getClockTime();
 const HISTORIC_HR_COMMAND = 104030201;
 const USER_DATA_COMMAND = 204030201;
 
+const HISTORIC_HR_ARRAY_SIZE = 8*1000 // (8 kbytes - 192 bytes) size
+const HISTORIC_HR_ARRAY_DATA_SIZE = 4 // each int stored equals to 4 bytes
+var historicHRArray = [HISTORIC_HR_ARRAY_SIZE];
+const STORE_PROPERTY_ARRAY_KEY = 1;
+const STORE_PROPERTY_ARRAY_POINTER_KEY = 2;
+
 // Seems a Garmin bug, because UTC time is UTC 00:00 Dec 31 1989
 //Unix UTC time: 1 January 1970
 //Garmin UTC time: 31 December 1989
@@ -173,7 +179,7 @@ class DFC_garmin_watchappView extends Ui.View {
 
 	// Identify the command sent
 	if (mail[0] == HISTORIC_HR_COMMAND) {
-	    command = HISTORIC_HR_COMMAND;
+	    command = HISTORIC_HR_COMMAND;to know
 	} else if (mail[0] == USER_DATA_COMMAND) {
 	    command = USER_DATA_COMMAND;
 	}
@@ -197,6 +203,11 @@ class DFC_garmin_watchappView extends Ui.View {
 	    while (HRSample != null) {
 		date = HRSample.when.value() + GARMIN_UTC_OFFSET;
 		if (date > startDate) {
+		  var tempHR = HRSample.data;
+		  if (tempHR == null) {
+		    HRSample = HRSensorHistoryIterator.next();
+		    continue;
+		  }
 		  dataArray.add(date);
 		  dataArray.add(HRSample.data);
 		  HRSample = HRSensorHistoryIterator.next();
@@ -221,6 +232,54 @@ class DFC_garmin_watchappView extends Ui.View {
 	// Transmit command response
 	Comm.transmit(dataArray, null, listener);
 	Comm.emptyMailbox();
+    }
+
+    function storeHR () {
+      // get the last date of HR historic stored
+      var app = App.getApp();
+      historicHRArray = app.getProperty(STORE_PROPERTY_ARRAY_KEY);
+      historicHRArrayPointer = app.getProperty(STORE_PROPERTY_ARRAY_POINTER_KEY);
+
+      // get the last date
+      var lastDate = historicHRArray[historicHRArrayPointer];
+
+      var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
+      {to know
+      //Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
+	  //:period => new Toybox.Time.Duration.initialize(5*60)
+	  :order => SensorHistory.ORDER_OLDEST_FIRST
+      });
+
+      var HRSample = HRSensorHistoryIterator.next();
+      while (HRSample != null) { // avoid null samples or end of HR historic data
+	  date = HRSample.when.value();
+
+	  if (date > lastDate) {
+
+	    var tempHR = HRSample.data;
+	    if (tempHR == null && tempHR < 90) { // HR value null or less of 90, keep iterating looking values we want
+	      HRSample = HRSensorHistoryIterator.next();
+	    } else {
+	      // verify if historicHRArrayPointer is at the end
+	      if (historicHRArrayPointer == (HISTORIC_HR_ARRAY_SIZE - (HISTORIC_HR_ARRAY_DATA_SIZE * 2)) {
+		  historicHRArrayPointer = 0;
+	      }
+
+	      historicHRArray[historicHRArrayPointer] = date;
+	      historicHRArray[historicHRArrayPointer + HISTORIC_HR_ARRAY_DATA_SIZE] = HRSample.data;
+	      historicHRArrayPointer += HISTORIC_HR_ARRAY_DATA_SIZE * 2;
+
+	      HRSample = HRSensorHistoryIterator.next();
+	    }
+
+	  } else { // we are at dates that are already stored, keep iterating looking for new dates
+	      HRSample = HRSensorHistoryIterator.next();
+	  }
+      }
+
+      // now save the values
+      app.setProperty(STORE_PROPERTY_ARRAY_KEY, historicHRArray);
+      app.setProperty(STORE_PROPERTY_ARRAY_POINTER_KEY, historicHRArrayPointer);
     }
 }
 
