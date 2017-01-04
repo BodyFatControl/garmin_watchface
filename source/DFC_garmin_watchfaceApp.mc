@@ -1,6 +1,6 @@
 using Toybox.Application as App;
 
-class DFC_garmin_watchapp extends App.AppBase {
+class DFC extends App.AppBase {
 
     function initialize() {
         AppBase.initialize();
