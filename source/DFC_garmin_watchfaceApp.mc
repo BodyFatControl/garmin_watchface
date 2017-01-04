@@ -16,6 +16,6 @@ class DFC extends App.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() {
-        return [ new DFC_garmin_watchappView() ];
+        return [ new DFC_garmin_watchappView(), new BaseInputDelegate()];
     }
 }

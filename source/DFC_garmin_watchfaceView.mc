@@ -29,17 +29,22 @@ class DFC_garmin_watchappView extends Ui.View {
     function initialize() {
 	View.initialize();
 
-        mailMethod = method(:onMail);
-        Comm.setMailboxListener(mailMethod);
-
         timer1.start(method(:timerCallback), 1000 * 60, true);
+    }
+
+    function onShow()
+    {
+      mailMethod = method(:onMail);
+      Comm.setMailboxListener(self.method(:onMail));
+    }
+
+    function onHide()
+    {
+      Comm.setMailboxListener(null);
     }
 
     // Update UI at frequency of timer
     function timerCallback() {
-
-
-
         Ui.requestUpdate();
     }
 
@@ -96,7 +101,7 @@ class DFC_garmin_watchappView extends Ui.View {
     }
 
     // Draw the hash mark symbols on the watch
-    // @param dc Device context
+    // @param dc Device contextComm.setMailboxListener(null);
     function drawHashMarks(dc) {
 	var width = dc.getWidth();
 	var height = dc.getHeight() - displayHeightOffset;
@@ -246,5 +251,41 @@ class CommListener extends Comm.ConnectionListener {
     // Fail to send data to Android app
     function onError() {
 //	System.println("send er " + Time.now().value());
+    }
+}
+
+class ConfirmationDialogDelegate extends Ui.ConfirmationDelegate {
+    function initialize() {
+	ConfirmationDelegate.initialize();
+    }
+
+    function onResponse(value) {
+        if (value == 0) {
+        }
+        else {
+            Ui.popView(Ui.SLIDE_UP); // close the app
+        }
+    }
+}
+
+
+class BaseInputDelegate extends Ui.BehaviorDelegate {
+    var dialog;
+
+    function initialize() {
+	BehaviorDelegate.initialize();
+    }
+
+    function onBack() {
+      return pushDialog();
+    }
+
+    function pushDialog() {
+        dialog = new Ui.Confirmation("Do you want to exit?");
+        Ui.pushView(dialog, new ConfirmationDialogDelegate(), Ui.SLIDE_IMMEDIATE);
+        return true;
+    }
+
+    function onNextPage() {
     }
 }

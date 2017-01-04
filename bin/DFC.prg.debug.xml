@@ -4,137 +4,155 @@
 <entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="29" pc="268435456" symbol="initialize"/>
 <entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="30" pc="268435460" symbol="initialize"/>
 <entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="32" pc="268435478" symbol="initialize"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="33" pc="268435502" symbol="initialize"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="35" pc="268435526" symbol="initialize"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="39" pc="268435568" symbol="timerCallback"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="43" pc="268435572" symbol="timerCallback"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="46" pc="268435589" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="48" pc="268435593" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="54" pc="268435761" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="56" pc="268435769" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="57" pc="268435788" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="58" pc="268435816" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="59" pc="268435837" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="62" pc="268435858" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="63" pc="268435876" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="64" pc="268435907" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="65" pc="268435938" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="69" pc="268435988" symbol="drawHoursHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="72" pc="268436003" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="74" pc="268436007" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="80" pc="268436175" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="82" pc="268436183" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="83" pc="268436202" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="84" pc="268436230" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="85" pc="268436251" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="88" pc="268436272" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="89" pc="268436290" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="90" pc="268436321" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="91" pc="268436352" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="95" pc="268436402" symbol="drawMinutesHand"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="100" pc="268436417" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="101" pc="268436421" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="102" pc="268436434" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="103" pc="268436456" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="105" pc="268436525" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="106" pc="268436549" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="107" pc="268436574" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="109" pc="268436590" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="111" pc="268436786" symbol="drawHashMarks"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="116" pc="268437008" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="117" pc="268437012" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="118" pc="268437028" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="119" pc="268437028" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="120" pc="268437028" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="121" pc="268437041" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="122" pc="268437058" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="123" pc="268437058" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="124" pc="268437058" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="126" pc="268437058" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="127" pc="268437071" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="35" pc="268435520" symbol="onShow"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="37" pc="268435524" symbol="onShow"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="38" pc="268435548" symbol="onShow"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="41" pc="268435581" symbol="onHide"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="43" pc="268435585" symbol="onHide"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="47" pc="268435603" symbol="timerCallback"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="48" pc="268435607" symbol="timerCallback"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="51" pc="268435624" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="53" pc="268435628" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="59" pc="268435796" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="61" pc="268435804" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="62" pc="268435823" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="63" pc="268435851" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="64" pc="268435872" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="67" pc="268435893" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="68" pc="268435911" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="69" pc="268435942" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="70" pc="268435973" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="74" pc="268436023" symbol="drawHoursHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="77" pc="268436038" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="79" pc="268436042" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="85" pc="268436210" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="87" pc="268436218" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="88" pc="268436237" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="89" pc="268436265" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="90" pc="268436286" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="93" pc="268436307" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="94" pc="268436325" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="95" pc="268436356" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="96" pc="268436387" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="100" pc="268436437" symbol="drawMinutesHand"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="105" pc="268436452" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="106" pc="268436456" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="107" pc="268436469" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="108" pc="268436491" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="110" pc="268436560" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="111" pc="268436584" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="112" pc="268436609" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="114" pc="268436625" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="116" pc="268436821" symbol="drawHashMarks"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="121" pc="268437043" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="122" pc="268437047" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="123" pc="268437063" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="124" pc="268437063" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="125" pc="268437063" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="126" pc="268437076" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="127" pc="268437093" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="128" pc="268437093" symbol="onUpdate"/>
 <entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="129" pc="268437093" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="130" pc="268437111" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="133" pc="268437152" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="134" pc="268437188" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="137" pc="268437232" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="138" pc="268437268" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="141" pc="268437327" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="142" pc="268437363" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="143" pc="268437407" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="144" pc="268437460" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="145" pc="268437507" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="148" pc="268437557" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="151" pc="268437571" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="152" pc="268437602" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="153" pc="268437612" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="154" pc="268437637" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="157" pc="268437653" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="158" pc="268437690" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="161" pc="268437706" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="162" pc="268437742" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="163" pc="268437775" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="164" pc="268437811" symbol="onUpdate"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="170" pc="268437845" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="171" pc="268437849" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="172" pc="268437873" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="173" pc="268437873" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="174" pc="268437881" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="176" pc="268437888" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="179" pc="268437901" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="180" pc="268437921" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="182" pc="268437954" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="186" pc="268437967" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="187" pc="268437981" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="188" pc="268437991" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="190" pc="268437991" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="197" pc="268438034" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="199" pc="268438047" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="200" pc="268438067" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="201" pc="268438087" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="202" pc="268438094" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="203" pc="268438122" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="204" pc="268438130" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="205" pc="268438140" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="206" pc="268438147" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="207" pc="268438160" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="209" pc="268438166" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="210" pc="268438180" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="211" pc="268438200" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="213" pc="268438216" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="219" pc="268438239" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="221" pc="268438256" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="222" pc="268438276" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="223" pc="268438296" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="224" pc="268438316" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="225" pc="268438336" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="226" pc="268438356" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="227" pc="268438376" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="231" pc="268438399" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="232" pc="268438420" symbol="onMail"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="237" pc="268438437" symbol="initialize"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="238" pc="268438441" symbol="initialize"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="242" pc="268438464" symbol="onComplete"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="247" pc="268438469" symbol="onError"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="5" pc="268438474" symbol="initialize"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="6" pc="268438478" symbol="initialize"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="10" pc="268438497" symbol="onStart"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="14" pc="268438502" symbol="onStop"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="18" pc="268438507" symbol="getInitialView"/>
-<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="19" pc="268438511" symbol="getInitialView"/>
-<entry filename="Rez" lineNum="18" pc="268438549" symbol="WatchFace"/>
-<entry filename="Rez" lineNum="20" pc="268438553" symbol="WatchFace"/>
-<entry filename="Rez" lineNum="21" pc="268438716" symbol="WatchFace"/>
-<entry filename="Rez" lineNum="22" pc="268438741" symbol="WatchFace"/>
-<entry filename="Rez" lineNum="23" pc="268438793" symbol="WatchFace"/>
-<entry filename="Rez" lineNum="26" pc="268438839" symbol="WatchFace"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="131" pc="268437093" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="132" pc="268437106" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="134" pc="268437128" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="135" pc="268437146" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="138" pc="268437187" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="139" pc="268437223" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="142" pc="268437267" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="143" pc="268437303" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="146" pc="268437362" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="147" pc="268437398" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="148" pc="268437442" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="149" pc="268437495" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="150" pc="268437542" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="153" pc="268437592" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="156" pc="268437606" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="157" pc="268437637" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="158" pc="268437647" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="159" pc="268437672" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="162" pc="268437688" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="163" pc="268437725" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="166" pc="268437741" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="167" pc="268437777" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="168" pc="268437810" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="169" pc="268437846" symbol="onUpdate"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="175" pc="268437880" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="176" pc="268437884" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="177" pc="268437908" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="178" pc="268437908" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="179" pc="268437916" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="181" pc="268437923" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="184" pc="268437936" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="185" pc="268437956" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="187" pc="268437989" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="191" pc="268438002" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="192" pc="268438016" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="193" pc="268438026" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="195" pc="268438026" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="202" pc="268438069" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="204" pc="268438082" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="205" pc="268438102" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="206" pc="268438122" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="207" pc="268438129" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="208" pc="268438157" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="209" pc="268438165" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="210" pc="268438175" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="211" pc="268438182" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="212" pc="268438195" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="214" pc="268438201" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="215" pc="268438215" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="216" pc="268438235" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="218" pc="268438251" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="224" pc="268438274" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="226" pc="268438291" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="227" pc="268438311" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="228" pc="268438331" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="229" pc="268438351" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="230" pc="268438371" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="231" pc="268438391" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="232" pc="268438411" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="236" pc="268438434" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="237" pc="268438455" symbol="onMail"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="242" pc="268438472" symbol="initialize"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="243" pc="268438476" symbol="initialize"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="247" pc="268438499" symbol="onComplete"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="252" pc="268438504" symbol="onError"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="258" pc="268438509" symbol="initialize"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="259" pc="268438513" symbol="initialize"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="262" pc="268438532" symbol="onResponse"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="263" pc="268438536" symbol="onResponse"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="266" pc="268438550" symbol="onResponse"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="275" pc="268438579" symbol="initialize"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="276" pc="268438583" symbol="initialize"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="279" pc="268438602" symbol="onBack"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="280" pc="268438606" symbol="onBack"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="283" pc="268438619" symbol="pushDialog"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="284" pc="268438623" symbol="pushDialog"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="285" pc="268438662" symbol="pushDialog"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="286" pc="268438720" symbol="pushDialog"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceView.mc" lineNum="289" pc="268438724" symbol="onNextPage"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="5" pc="268438729" symbol="initialize"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="6" pc="268438733" symbol="initialize"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="10" pc="268438752" symbol="onStart"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="14" pc="268438757" symbol="onStop"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="18" pc="268438762" symbol="getInitialView"/>
+<entry filename="/home/cas/DailyFatControl/garmin_watchface/source/DFC_garmin_watchfaceApp.mc" lineNum="19" pc="268438766" symbol="getInitialView"/>
+<entry filename="Rez" lineNum="18" pc="268438834" symbol="WatchFace"/>
+<entry filename="Rez" lineNum="20" pc="268438838" symbol="WatchFace"/>
+<entry filename="Rez" lineNum="21" pc="268439001" symbol="WatchFace"/>
+<entry filename="Rez" lineNum="22" pc="268439026" symbol="WatchFace"/>
+<entry filename="Rez" lineNum="23" pc="268439078" symbol="WatchFace"/>
+<entry filename="Rez" lineNum="26" pc="268439124" symbol="WatchFace"/>
 </pcToLineNum>
 <symbolTable>
-<entry id="22" method="true" symbol="drawHoursHand"/>
+<entry id="26" method="true" symbol="drawHoursHand"/>
 <entry id="8389781" symbol="SensorHistory"/>
+<entry id="23" method="true" symbol="pushDialog"/>
 <entry id="8389124" method="true" symbol="onUpdate"/>
 <entry id="8389349" symbol="justification"/>
 <entry field="true" id="10" symbol="HISTORIC_HR_COMMAND"/>
-<entry field="true" id="20" symbol="displayHeightOffset"/>
+<entry field="true" id="24" symbol="displayHeightOffset"/>
 <entry field="true" id="8388611" symbol="Toybox"/>
 <entry id="8388645" symbol="Time"/>
 <entry field="true" id="9" symbol="clockTime"/>
@@ -143,87 +161,101 @@
 <entry id="8388640" symbol="Lang"/>
 <entry id="8388769" module="true" symbol="Rez"/>
 <entry field="true" id="11" symbol="USER_DATA_COMMAND"/>
+<entry id="8389123" method="true" symbol="onShow"/>
 <entry id="8388702" method="true" symbol="initialize"/>
-<entry field="true" id="19" symbol="AppName"/>
+<entry field="true" id="21" symbol="AppName"/>
 <entry field="true" id="12" symbol="GARMIN_UTC_OFFSET"/>
 <entry id="8388647" symbol="UserProfile"/>
 <entry id="8389375" method="true" symbol="WatchFace"/>
+<entry id="8389078" method="true" symbol="onNextPage"/>
+<entry field="true" id="22" symbol="dialog"/>
 <entry id="8389809" symbol="order"/>
-<entry field="true" id="18" symbol="LauncherIcon"/>
+<entry id="8389108" method="true" symbol="onResponse"/>
+<entry field="true" id="20" symbol="LauncherIcon"/>
 <entry id="14" object="true" symbol="CommListener"/>
 <entry id="8388646" symbol="Timer"/>
+<entry id="8389081" method="true" symbol="onBack"/>
 <entry field="true" id="8388696" symbol="timer1"/>
 <entry id="8389281" method="true" symbol="onStop"/>
 <entry id="8388829" method="true" symbol="onComplete"/>
 <entry id="8389065" symbol="locY"/>
 <entry id="8389064" symbol="locX"/>
 <entry id="8388771" module="true" symbol="Drawables"/>
+<entry id="16" object="true" symbol="BaseInputDelegate"/>
 <entry id="8389279" method="true" symbol="onStart"/>
 <entry id="8389348" symbol="font"/>
 <entry id="13" object="true" symbol="DFC_garmin_watchappView"/>
 <entry id="8389347" symbol="color"/>
-<entry id="24" method="true" symbol="drawHashMarks"/>
-<entry id="25" method="true" symbol="onMail"/>
-<entry id="23" method="true" symbol="drawMinutesHand"/>
-<entry id="17" module="true" symbol="Layouts"/>
+<entry id="28" method="true" symbol="drawHashMarks"/>
+<entry id="29" method="true" symbol="onMail"/>
+<entry id="27" method="true" symbol="drawMinutesHand"/>
+<entry id="19" module="true" symbol="Layouts"/>
 <entry field="true" id="8" symbol="mailMethod"/>
+<entry id="8389125" method="true" symbol="onHide"/>
 <entry id="8388828" method="true" symbol="onError"/>
-<entry id="21" method="true" symbol="timerCallback"/>
+<entry id="15" object="true" symbol="ConfirmationDialogDelegate"/>
+<entry id="25" method="true" symbol="timerCallback"/>
 <entry id="8389063" symbol="identifier"/>
-<entry id="16" module="true" symbol="Menus"/>
+<entry id="18" module="true" symbol="Menus"/>
 <entry id="8388772" module="true" symbol="Fonts"/>
 <entry id="8388633" symbol="ActivityMonitor"/>
-<entry id="15" object="true" symbol="DFC"/>
+<entry id="17" object="true" symbol="DFC"/>
 </symbolTable>
 <localVars>
-<entry endPc="268435975" name="x" stackId="10" startPc="268435876"/>
-<entry endPc="268435975" name="y" stackId="11" startPc="268435876"/>
-<entry endPc="268435988" name="i" stackId="9" startPc="268435876"/>
-<entry endPc="268436002" name="result" stackId="4" startPc="268435593"/>
-<entry endPc="268436002" name="sin" stackId="8" startPc="268435593"/>
-<entry endPc="268436002" name="cos" stackId="7" startPc="268435593"/>
-<entry endPc="268436002" name="centerY" stackId="6" startPc="268435593"/>
-<entry endPc="268436002" name="coords" stackId="3" startPc="268435593"/>
-<entry endPc="268436002" name="centerX" stackId="5" startPc="268435593"/>
-<entry endPc="268436389" name="x" stackId="10" startPc="268436290"/>
-<entry endPc="268436389" name="y" stackId="11" startPc="268436290"/>
-<entry endPc="268436402" name="i" stackId="9" startPc="268436290"/>
-<entry endPc="268436416" name="result" stackId="4" startPc="268436007"/>
-<entry endPc="268436416" name="sin" stackId="8" startPc="268436007"/>
-<entry endPc="268436416" name="cos" stackId="7" startPc="268436007"/>
-<entry endPc="268436416" name="centerY" stackId="6" startPc="268436007"/>
-<entry endPc="268436416" name="coords" stackId="3" startPc="268436007"/>
-<entry endPc="268436416" name="centerX" stackId="5" startPc="268436007"/>
-<entry endPc="268436994" name="upperX" stackId="7" startPc="268436549"/>
-<entry endPc="268436994" name="dx" stackId="6" startPc="268436549"/>
-<entry endPc="268437007" name="i" stackId="5" startPc="268436549"/>
-<entry endPc="268437007" name="height" stackId="3" startPc="268436421"/>
-<entry endPc="268437007" name="width" stackId="2" startPc="268436421"/>
-<entry endPc="268437007" name="coords" stackId="4" startPc="268436421"/>
-<entry endPc="268437844" name="hourHandAngle" stackId="7" startPc="268437012"/>
-<entry endPc="268437844" name="height" stackId="4" startPc="268437012"/>
-<entry endPc="268437844" name="font" stackId="2" startPc="268437012"/>
-<entry endPc="268437844" name="minuteHandAngle" stackId="8" startPc="268437012"/>
-<entry endPc="268437844" name="width" stackId="3" startPc="268437012"/>
-<entry endPc="268437844" name="clockTime" stackId="6" startPc="268437012"/>
-<entry endPc="268437844" name="screenWidth" stackId="5" startPc="268437012"/>
-<entry endPc="268437844" name="secondHandAngle" stackId="9" startPc="268437012"/>
-<entry endPc="268438213" name="tempHR" stackId="10" startPc="268438130"/>
-<entry endPc="268438222" name="HRSample" stackId="9" startPc="268437981"/>
-<entry endPc="268438222" name="startDate" stackId="6" startPc="268437981"/>
-<entry endPc="268438222" name="date" stackId="7" startPc="268437981"/>
-<entry endPc="268438222" name="HRSensorHistoryIterator" stackId="8" startPc="268437981"/>
-<entry endPc="268438396" name="userProfile" stackId="11" startPc="268438239"/>
-<entry endPc="268438436" name="dataArray" stackId="4" startPc="268437849"/>
-<entry endPc="268438436" name="mail" stackId="3" startPc="268437849"/>
-<entry endPc="268438436" name="listener" stackId="2" startPc="268437849"/>
-<entry endPc="268438436" name="command" stackId="5" startPc="268437849"/>
-<entry endPc="268438856" name="rez_cmp_local_bitmap_TimeLabel" stackId="2" startPc="268438553"/>
-<entry endPc="268438856" name="rez_cmp_local_bitmap_TimeLabel_fontHeight" stackId="3" startPc="268438553"/>
+<entry endPc="268436010" name="x" stackId="10" startPc="268435911"/>
+<entry endPc="268436010" name="y" stackId="11" startPc="268435911"/>
+<entry endPc="268436023" name="i" stackId="9" startPc="268435911"/>
+<entry endPc="268436037" name="result" stackId="4" startPc="268435628"/>
+<entry endPc="268436037" name="sin" stackId="8" startPc="268435628"/>
+<entry endPc="268436037" name="cos" stackId="7" startPc="268435628"/>
+<entry endPc="268436037" name="centerY" stackId="6" startPc="268435628"/>
+<entry endPc="268436037" name="coords" stackId="3" startPc="268435628"/>
+<entry endPc="268436037" name="centerX" stackId="5" startPc="268435628"/>
+<entry endPc="268436424" name="x" stackId="10" startPc="268436325"/>
+<entry endPc="268436424" name="y" stackId="11" startPc="268436325"/>
+<entry endPc="268436437" name="i" stackId="9" startPc="268436325"/>
+<entry endPc="268436451" name="result" stackId="4" startPc="268436042"/>
+<entry endPc="268436451" name="sin" stackId="8" startPc="268436042"/>
+<entry endPc="268436451" name="cos" stackId="7" startPc="268436042"/>
+<entry endPc="268436451" name="centerY" stackId="6" startPc="268436042"/>
+<entry endPc="268436451" name="coords" stackId="3" startPc="268436042"/>
+<entry endPc="268436451" name="centerX" stackId="5" startPc="268436042"/>
+<entry endPc="268437029" name="upperX" stackId="7" startPc="268436584"/>
+<entry endPc="268437029" name="dx" stackId="6" startPc="268436584"/>
+<entry endPc="268437042" name="i" stackId="5" startPc="268436584"/>
+<entry endPc="268437042" name="height" stackId="3" startPc="268436456"/>
+<entry endPc="268437042" name="width" stackId="2" startPc="268436456"/>
+<entry endPc="268437042" name="coords" stackId="4" startPc="268436456"/>
+<entry endPc="268437879" name="hourHandAngle" stackId="7" startPc="268437047"/>
+<entry endPc="268437879" name="height" stackId="4" startPc="268437047"/>
+<entry endPc="268437879" name="font" stackId="2" startPc="268437047"/>
+<entry endPc="268437879" name="minuteHandAngle" stackId="8" startPc="268437047"/>
+<entry endPc="268437879" name="width" stackId="3" startPc="268437047"/>
+<entry endPc="268437879" name="clockTime" stackId="6" startPc="268437047"/>
+<entry endPc="268437879" name="screenWidth" stackId="5" startPc="268437047"/>
+<entry endPc="268437879" name="secondHandAngle" stackId="9" startPc="268437047"/>
+<entry endPc="268438248" name="tempHR" stackId="10" startPc="268438165"/>
+<entry endPc="268438257" name="HRSample" stackId="9" startPc="268438016"/>
+<entry endPc="268438257" name="startDate" stackId="6" startPc="268438016"/>
+<entry endPc="268438257" name="date" stackId="7" startPc="268438016"/>
+<entry endPc="268438257" name="HRSensorHistoryIterator" stackId="8" startPc="268438016"/>
+<entry endPc="268438431" name="userProfile" stackId="11" startPc="268438274"/>
+<entry endPc="268438471" name="dataArray" stackId="4" startPc="268437884"/>
+<entry endPc="268438471" name="mail" stackId="3" startPc="268437884"/>
+<entry endPc="268438471" name="listener" stackId="2" startPc="268437884"/>
+<entry endPc="268438471" name="command" stackId="5" startPc="268437884"/>
+<entry endPc="268439141" name="rez_cmp_local_bitmap_TimeLabel" stackId="2" startPc="268438838"/>
+<entry endPc="268439141" name="rez_cmp_local_bitmap_TimeLabel_fontHeight" stackId="3" startPc="268438838"/>
 </localVars>
 <annotations/>
 <functions>
 <functionEntry name="initialize" parent="DFC_garmin_watchappView">
+<documentation/>
+</functionEntry>
+<functionEntry name="onShow" parent="DFC_garmin_watchappView">
+<documentation/>
+</functionEntry>
+<functionEntry name="onHide" parent="DFC_garmin_watchappView">
 <documentation/>
 </functionEntry>
 <functionEntry name="timerCallback" parent="DFC_garmin_watchappView">
@@ -258,6 +290,25 @@
 <documentation/>
 </functionEntry>
 <functionEntry name="onError" parent="CommListener">
+<documentation/>
+</functionEntry>
+<functionEntry name="initialize" parent="ConfirmationDialogDelegate">
+<documentation/>
+</functionEntry>
+<functionEntry name="onResponse" parent="ConfirmationDialogDelegate">
+<param id="value"/>
+<documentation/>
+</functionEntry>
+<functionEntry name="initialize" parent="BaseInputDelegate">
+<documentation/>
+</functionEntry>
+<functionEntry name="onBack" parent="BaseInputDelegate">
+<documentation/>
+</functionEntry>
+<functionEntry name="pushDialog" parent="BaseInputDelegate">
+<documentation/>
+</functionEntry>
+<functionEntry name="onNextPage" parent="BaseInputDelegate">
 <documentation/>
 </functionEntry>
 <functionEntry name="initialize" parent="DFC">
