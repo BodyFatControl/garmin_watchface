@@ -180,16 +180,9 @@ class DFC_garmin_watchappView extends Ui.View {
 
 	mail = mailIter.next();
 
-	// Identify the command sent
-	if (mail[0] == HISTORIC_HR_COMMAND) {
-	    command = HISTORIC_HR_COMMAND;
-	} else if (mail[0] == USER_DATA_COMMAND) {
-	    command = USER_DATA_COMMAND;
-	}
-
 	// Execute the command
-	if (command == HISTORIC_HR_COMMAND) {
-	    var startDate = mail[2];
+	if (mail[0] == HISTORIC_HR_COMMAND) {
+	    var startDate = mail[1];
 	    var date;
 
 	    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
@@ -202,7 +195,6 @@ class DFC_garmin_watchappView extends Ui.View {
 	    var HRSample = HRSensorHistoryIterator.next();
 	    // Starting building the command response
 	    dataArray.add(HISTORIC_HR_COMMAND);
-	    dataArray.add(mail[1]); // send back the random ID
 	    while (HRSample != null) {
 		date = HRSample.when.value() + GARMIN_UTC_OFFSET;
 		if (date > startDate) {
@@ -218,13 +210,12 @@ class DFC_garmin_watchappView extends Ui.View {
 		    break;
 		}
 	    }
-	} else if (command == USER_DATA_COMMAND) {
+	} else if (mail[0] == USER_DATA_COMMAND) {
 
 	    // Get the parameters from the command
 	    var userProfile = UserProfile.getProfile();
 	    // Starting building the command response
 	    dataArray.add(USER_DATA_COMMAND);
-	    dataArray.add(mail[1]); // send back the random ID
 	    dataArray.add(userProfile.birthYear);
 	    dataArray.add(userProfile.gender);
 	    dataArray.add(userProfile.height);
