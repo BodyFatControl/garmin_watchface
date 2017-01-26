@@ -11,11 +11,16 @@ using Toybox.UserProfile as UserProfile;
 using Toybox.Application as App;
 
 var mailMethod;
+var commListener = new CommListener();
 var timer1 = new Timer.Timer();
+var timer2 = new Timer.Timer();
+
+var secondsCounter = 0;
 
 var clockTime = Sys.getClockTime();
 
 const HISTORIC_HR_COMMAND = 104030201;
+const ALIVE_COMMAND = 154030201;
 const USER_DATA_COMMAND = 204030201;
 
 // Seems a Garmin bug, because UTC time is UTC 00:00 Dec 31 1989
@@ -29,7 +34,7 @@ class DFC_garmin_watchappView extends Ui.View {
     function initialize() {
 	View.initialize();
 
-        timer1.start(method(:timerCallback), 1000 * 60, true);
+        timer1.start(method(:timerCallback), 60*1000, true);
     }
 
     function onShow()
@@ -167,16 +172,23 @@ class DFC_garmin_watchappView extends Ui.View {
 	dc.fillCircle(width / 2, height / 2, 5);
 	dc.setColor(Gfx.COLOR_BLACK,Gfx.COLOR_BLACK);
 	dc.drawCircle(width / 2, height / 2, 5);
+
+	secondsCounter++;
+	if (secondsCounter >= 2) {
+	    secondsCounter = 0;
+
+	    var dataArray = [];
+	    dataArray.add(ALIVE_COMMAND);
+	    Comm.transmit(dataArray, null, commListener);
+	}
     }
 
     /*******************************************************
      * Receive here the data sent from the Android app
      */
     function onMail(mailIter) {
-	var listener = new CommListener();
 	var mail;
 	var dataArray = [];
-	var command = 0;
 
 	mail = mailIter.next();
 
@@ -224,7 +236,7 @@ class DFC_garmin_watchappView extends Ui.View {
 	}
 
 	// Transmit command response
-	Comm.transmit(dataArray, null, listener);
+	Comm.transmit(dataArray, null, commListener);
 	Comm.emptyMailbox();
     }
 }
