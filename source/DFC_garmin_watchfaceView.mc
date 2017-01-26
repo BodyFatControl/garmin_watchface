@@ -12,6 +12,7 @@ using Toybox.Application as App;
 
 var mailMethod;
 var commListener = new CommListener();
+var sendCommBusy = false;
 var timer1 = new Timer.Timer();
 var timer2 = new Timer.Timer();
 
@@ -32,56 +33,60 @@ const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Ti
  * Receive here the data sent from the Android app
  */
 function onMail(mailIter) {
-    var mail;
-    var dataArray = [];
+    if (sendCommBusy == false) { // we just can send data if Comm is not busy, so ignore received command while Comm is busy
+	var mail;
+	var dataArray = [];
 
-    mail = mailIter.next();
+	mail = mailIter.next();
 
-    // Execute the command
-    if (mail[0] == HISTORIC_HR_COMMAND) {
-	var startDate = mail[1];
-	var date;
+	// Execute the command
+	if (mail[0] == HISTORIC_HR_COMMAND) {
+	    var startDate = mail[1];
+	    var date;
 
-	var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
-	    {
-	    //Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
-		//:period => new Toybox.Time.Duration.initialize(5*60)
-		:order => SensorHistory.ORDER_NEWEST_FIRST
-	    });
+	    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
+		{
+		//Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
+		    //:period => new Toybox.Time.Duration.initialize(5*60)
+		    :order => SensorHistory.ORDER_NEWEST_FIRST
+		});
 
-	var HRSample = HRSensorHistoryIterator.next();
-	// Starting building the command response
-	dataArray.add(HISTORIC_HR_COMMAND);
-	while (HRSample != null) {
-	    date = HRSample.when.value() + GARMIN_UTC_OFFSET;
-	    if (date > startDate) {
-	      var tempHR = HRSample.data;
-	      if (tempHR == null) {
-		HRSample = HRSensorHistoryIterator.next();
-		continue;
-	      }
-	      dataArray.add(date);
-	      dataArray.add(HRSample.data);
-	      HRSample = HRSensorHistoryIterator.next();
-	    } else {
-		break;
+	    var HRSample = HRSensorHistoryIterator.next();
+	    // Starting building the command response
+	    dataArray.add(HISTORIC_HR_COMMAND);
+	    while (HRSample != null) {
+		date = HRSample.when.value() + GARMIN_UTC_OFFSET;
+		if (date > startDate) {
+		  var tempHR = HRSample.data;
+		  if (tempHR == null) {
+		    HRSample = HRSensorHistoryIterator.next();
+		    continue;
+		  }
+		  dataArray.add(date);
+		  dataArray.add(HRSample.data);
+		  HRSample = HRSensorHistoryIterator.next();
+		} else {
+		    break;
+		}
 	    }
-	}
-    } else if (mail[0] == USER_DATA_COMMAND) {
+	} else if (mail[0] == USER_DATA_COMMAND) {
 
-	// Get the parameters from the command
-	var userProfile = UserProfile.getProfile();
-	// Starting building the command response
-	dataArray.add(USER_DATA_COMMAND);
-	dataArray.add(userProfile.birthYear);
-	dataArray.add(userProfile.gender);
-	dataArray.add(userProfile.height);
-	dataArray.add(userProfile.weight);
-	dataArray.add(userProfile.activityClass);
+	    // Get the parameters from the command
+	    var userProfile = UserProfile.getProfile();
+	    // Starting building the command response
+	    dataArray.add(USER_DATA_COMMAND);
+	    dataArray.add(userProfile.birthYear);
+	    dataArray.add(userProfile.gender);
+	    dataArray.add(userProfile.height);
+	    dataArray.add(userProfile.weight);
+	    dataArray.add(userProfile.activityClass);
+	}
+
+	// Transmit command response
+	sendCommBusy = true;
+	Comm.transmit(dataArray, null, commListener);
     }
 
-    // Transmit command response
-    Comm.transmit(dataArray, null, commListener);
     Comm.emptyMailbox();
 }
 
@@ -94,19 +99,22 @@ function timer2Callback() {
 }
 
 function sendAliveCommand () {
-    // Enable communications
-    mailMethod = method(:onMail);
-    Comm.setMailboxListener(self.method(:onMail));
+    if (sendCommBusy == false) {
+      // Enable communications
+      mailMethod = method(:onMail);
+      Comm.setMailboxListener(self.method(:onMail));
 
-    // Prepare and send the command
-    var dataArray = [];
-    dataArray.add(ALIVE_COMMAND);
-    Comm.transmit(dataArray, null, commListener);
+      // Prepare and send the command
+      var dataArray = [];
+      dataArray.add(ALIVE_COMMAND);
+      sendCommBusy = true;
+      Comm.transmit(dataArray, null, commListener);
 
-    // Start timer to disable communications after 10s
-    // tested: 4s is enough sending and processing the information; 10s safe value
-    timer2.stop();
-    timer2.start(method(:timer2Callback), 10*1000, true);
+      // Start timer to disable communications after 10s
+      // tested: 4s is enough sending and processing the information; 10s safe value
+      timer2.stop();
+      timer2.start(method(:timer2Callback), 10*1000, true);
+    }
 }
 
 class DFC_garmin_watchappView extends Ui.View {
@@ -255,12 +263,12 @@ class CommListener extends Comm.ConnectionListener {
 
     // Sucess to send data to Android app
     function onComplete() {
-//	System.println("send ok " + Time.now().value());
+	sendCommBusy = false;
     }
 
     // Fail to send data to Android app
     function onError() {
-//	System.println("send er " + Time.now().value());
+	sendCommBusy = false;
     }
 }
 
