@@ -10,7 +10,7 @@ using Toybox.Time as Time;
 using Toybox.UserProfile as UserProfile;
 using Toybox.Application as App;
 
-var mailMethod;
+var phoneMethod;
 var commListener = new CommListener();
 var sendCommBusy = false;
 var timer1 = new Timer.Timer();
@@ -32,16 +32,13 @@ const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Ti
 /*******************************************************
  * Receive here the data sent from the Android app
  */
-function onMail(mailIter) {
+function onPhone(msg) {
     if (sendCommBusy == false) { // we just can send data if Comm is not busy, so ignore received command while Comm is busy
-	var mail;
 	var dataArray = [];
 
-	mail = mailIter.next();
-
 	// Execute the command
-	if (mail[0] == HISTORIC_HR_COMMAND) {
-	    var startDate = mail[1];
+	if (msg.data[0] == HISTORIC_HR_COMMAND) {
+	    var startDate = msg.data[1];
 	    var date;
 
 	    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
@@ -69,7 +66,7 @@ function onMail(mailIter) {
 		    break;
 		}
 	    }
-	} else if (mail[0] == USER_DATA_COMMAND) {
+	} else if (msg.data[0] == USER_DATA_COMMAND) {
 
 	    // Get the parameters from the command
 	    var userProfile = UserProfile.getProfile();
@@ -86,14 +83,11 @@ function onMail(mailIter) {
 	sendCommBusy = true;
 	Comm.transmit(dataArray, null, commListener);
     }
-
-    Comm.emptyMailbox();
 }
 
 // Disable communications after timeout
 function timer2Callback() {
-    Comm.setMailboxListener(null);
-    mailMethod = null;
+    Comm.registerForPhoneAppMessages(null);
 
     timer2.stop();
 }
@@ -101,8 +95,7 @@ function timer2Callback() {
 function sendAliveCommand () {
     if (sendCommBusy == false) {
       // Enable communications
-      mailMethod = method(:onMail);
-      Comm.setMailboxListener(self.method(:onMail));
+      Comm.registerForPhoneAppMessages(phoneMethod);
 
       // Prepare and send the command
       var dataArray = [];
@@ -122,6 +115,8 @@ class DFC_garmin_watchappView extends Ui.View {
 
     function initialize() {
 	View.initialize();
+
+	phoneMethod = method(:onPhone);
 
         timer1.start(method(:timer1Callback), 60*1000, true);
     }
