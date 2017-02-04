@@ -1,10 +1,9 @@
 using Toybox.WatchUi as Ui;
 using Toybox.Graphics as Gfx;
 using Toybox.System as Sys;
-using Toybox.Lang as Lang;
 using Toybox.Communications as Comm;
 using Toybox.Timer as Timer;
-using Toybox.ActivityMonitor as ActivityMonitor;
+using Toybox.Sensor as Sensor;
 using Toybox.SensorHistory as SensorHistory;
 using Toybox.Time as Time;
 using Toybox.UserProfile as UserProfile;
@@ -15,6 +14,11 @@ var commListener = new CommListener();
 var sendCommBusy = false;
 var timer1 = new Timer.Timer();
 var timer2 = new Timer.Timer();
+var HR_value = 0;
+var sport_mode = false;
+
+var screenWidth;
+var screenHeight;
 
 var secondsCounter = 0;
 
@@ -28,6 +32,31 @@ const USER_DATA_COMMAND = 204030201;
 //Unix UTC time: 1 January 1970
 //Garmin UTC time: 31 December 1989
 const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Time.Gregorian.SECONDS_PER_DAY;
+
+function onSensorHR(sensor_info)
+{
+  var HR = sensor_info.heartRate;
+  if(HR != null)
+  {
+    HR_value = HR;
+    if (HR >= 90) {
+      sport_mode = true;
+    } else {
+      sport_mode = false;
+    }
+  }
+
+  Ui.requestUpdate();
+}
+
+function enableHRSensor() {
+  Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
+  Sensor.enableSensorEvents(method(:onSensorHR));
+}
+
+function disableHRSensor() {
+  Sensor.setEnabledSensors([]);
+}
 
 /*******************************************************
  * Receive here the data sent from the Android app
@@ -111,20 +140,23 @@ function sendAliveCommand () {
 }
 
 class DFC_garmin_watchappView extends Ui.View {
-    const displayHeightOffset = 57;
+  const DISPLAY_HEIGHT_OFFSET = 57;
 
-    function initialize() {
-	View.initialize();
+  function initialize() {
+    View.initialize();
 
-	phoneMethod = method(:onPhone);
+    phoneMethod = method(:onPhone);
 
-        timer1.start(method(:timer1Callback), 60*1000, true);
-    }
+    // Enable HR sensor - processing of result on the event handler
+    enableHRSensor();
 
-    // Update UI at frequency of timer
-    function timer1Callback() {
-        Ui.requestUpdate();
-    }
+    timer1.start(method(:timer1Callback), 60*1000, true);
+  }
+
+  // Update UI at frequency of timer
+  function timer1Callback() {
+    Ui.requestUpdate();
+  }
 
     function drawHoursHand(dc, angle) {
 	// Map out the coordinates of the watch hand
@@ -137,11 +169,11 @@ class DFC_garmin_watchappView extends Ui.View {
 	var result = new [4];
 
 	var centerX = dc.getWidth() / 2;
-	var centerY = (dc.getHeight() - displayHeightOffset) / 2;
+	var centerY = (dc.getHeight() - DISPLAY_HEIGHT_OFFSET) / 2;
 	var cos = Math.cos(angle);
 	var sin = Math.sin(angle);
 
-      // Transform the coordinates
+      // Transform the coordina_tes
       for (var i = 0; i < 4; i += 1) {
 	  var x = (coords[i][0] * cos) - (coords[i][1] * sin);
 	  var y = (coords[i][0] * sin) + (coords[i][1] * cos);
@@ -163,7 +195,7 @@ class DFC_garmin_watchappView extends Ui.View {
 	var result = new [4];
 
 	var centerX = dc.getWidth() / 2;
-	var centerY = (dc.getHeight() - displayHeightOffset) / 2;
+	var centerY = (dc.getHeight() - DISPLAY_HEIGHT_OFFSET) / 2;
 	var cos = Math.cos(angle);
 	var sin = Math.sin(angle);
 
@@ -182,7 +214,7 @@ class DFC_garmin_watchappView extends Ui.View {
     // @param dc Device contextComm.setMailboxListener(null);
     function drawHashMarks(dc) {
 	var width = dc.getWidth();
-	var height = dc.getHeight() - displayHeightOffset;
+	var height = dc.getHeight() - DISPLAY_HEIGHT_OFFSET;
 	var coords = [0, width / 4, (3 * width) / 4, width];
 
 	for (var i = 0; i < coords.size(); i += 1) {
@@ -193,62 +225,71 @@ class DFC_garmin_watchappView extends Ui.View {
 	  // Draw the lower hash marks
 	  dc.fillPolygon([[coords[i] - 1, height-2], [upperX - 1, height - 12], [upperX + 1, height - 12], [coords[i] + 1, height - 2]]);
 	}
-     }
-
-    // Update the view
-    function onUpdate(dc) {
-	var font = Graphics.FONT_LARGE;
-	var width;
-	var height;
-	var screenWidth = dc.getWidth();
-	var clockTime = Sys.getClockTime();
-	var hourHandAngle;
-	var minuteHandAngle;
-	var secondHandAngle;
-
-	width = dc.getWidth();
-	height = dc.getHeight() - displayHeightOffset;
-
-	// Clear the screen
-	dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
-	dc.fillRectangle(0, 0, dc.getWidth(), dc.getHeight());
-
-	// Draw lowest rectangle
-	dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-	dc.fillRectangle(0, dc.getHeight() - displayHeightOffset, dc.getWidth(), dc.getHeight());
-
-	// Draw the numbers
-	dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-	dc.drawText((width / 2), 0, font, "12", Gfx.TEXT_JUSTIFY_CENTER);
-	dc.drawText(width - 2, (height / 2) - 15, font, "3", Gfx.TEXT_JUSTIFY_RIGHT);
-	dc.drawText(width / 2, height - 28, font, "6", Gfx.TEXT_JUSTIFY_CENTER);
-	dc.drawText(2, (height / 2) - 15, font, "9", Gfx.TEXT_JUSTIFY_LEFT);
-
-	// Draw the hash marks
-	drawHashMarks(dc);
-
-	// Draw the hour. Convert it to minutes and compute the angle.
-	hourHandAngle = (((clockTime.hour % 12) * 60) + clockTime.min);
-	hourHandAngle = hourHandAngle / (12 * 60.0);
-	hourHandAngle = hourHandAngle * Math.PI * 2;
-	drawHoursHand(dc, hourHandAngle);
-
-	// Draw the minute
-	minuteHandAngle = (clockTime.min / 60.0) * Math.PI * 2;
-	drawMinutesHand(dc, minuteHandAngle);
-
-	// Draw the arbor
-	dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-	dc.fillCircle(width / 2, height / 2, 5);
-	dc.setColor(Gfx.COLOR_BLACK,Gfx.COLOR_BLACK);
-	dc.drawCircle(width / 2, height / 2, 5);
-
-	secondsCounter++;
-	if (secondsCounter >= 2) {
-	    secondsCounter = 0;
-	    sendAliveCommand();
-	}
     }
+
+  // Update the view
+  function onUpdate(dc) {
+    var font = Graphics.FONT_LARGE;
+    var width;
+    var height;
+    screenWidth = dc.getWidth();
+    screenHeight = dc.getHeight();
+    var clockTime = Sys.getClockTime();
+    var hourHandAngle;
+    var minuteHandAngle;
+    var secondHandAngle;
+
+    width = dc.getWidth();
+    height = dc.getHeight() - DISPLAY_HEIGHT_OFFSET;
+
+    // Clear the screen
+    dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
+    dc.fillRectangle(0, 0, dc.getWidth(), dc.getHeight());
+
+    // Draw lowest rectangle
+    dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+    dc.fillRectangle(0, dc.getHeight() - DISPLAY_HEIGHT_OFFSET, dc.getWidth(), dc.getHeight());
+
+    // Draw the numbers
+    dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+    dc.drawText((width / 2), 0, font, "12", Gfx.TEXT_JUSTIFY_CENTER);
+    dc.drawText(width - 2, (height / 2) - 15, font, "3", Gfx.TEXT_JUSTIFY_RIGHT);
+    dc.drawText(width / 2, height - 28, font, "6", Gfx.TEXT_JUSTIFY_CENTER);
+    dc.drawText(2, (height / 2) - 15, font, "9", Gfx.TEXT_JUSTIFY_LEFT);
+
+    // Draw the hash marks
+    drawHashMarks(dc);
+
+    // Draw the hour. Convert it to minutes and compute the angle.
+    hourHandAngle = (((clockTime.hour % 12) * 60) + clockTime.min);
+    hourHandAngle = hourHandAngle / (12 * 60.0);
+    hourHandAngle = hourHandAngle * Math.PI * 2;
+    drawHoursHand(dc, hourHandAngle);
+
+    // Draw the minute
+    minuteHandAngle = (clockTime.min / 60.0) * Math.PI * 2;
+    drawMinutesHand(dc, minuteHandAngle);
+
+    // Draw the arbor
+    dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+    dc.fillCircle(width / 2, height / 2, 5);
+    dc.setColor(Gfx.COLOR_BLACK,Gfx.COLOR_BLACK);
+    dc.drawCircle(width / 2, height / 2, 5);
+
+
+
+    // Display the HR value
+    if (HR_value > 0) {
+      dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+      dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 20)), Graphics.FONT_LARGE, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
+    }
+
+    secondsCounter++;
+    if (secondsCounter >= 2) {
+      secondsCounter = 0;
+      sendAliveCommand();
+    }
+  }
 }
 
 class CommListener extends Comm.ConnectionListener {
