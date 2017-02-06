@@ -14,10 +14,11 @@ var commListener = new CommListener();
 var sendCommBusy = false;
 var timer1 = new Timer.Timer();
 var HR_value = 0;
+var HRSensorEnable = false;
 var sport_mode = false;
 const SPORT_MODE_MIN_TIME = 30; // in seconds
 var onSensorHRCounter = SPORT_MODE_MIN_TIME;
-
+var last_minute = -1;
 var screenWidth;
 var screenHeight;
 
@@ -65,12 +66,17 @@ function onSensorHR(sensor_info)
 }
 
 function enableHRSensor() {
-  Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
-  Sensor.enableSensorEvents(method(:onSensorHR));
+//  if (HRSensorEnable == false) {
+    Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
+    Sensor.enableSensorEvents(method(:onSensorHR));
+    HRSensorEnable = true;
+//  }
 }
 
 function disableHRSensor() {
   Sensor.setEnabledSensors([]);
+  Sensor.enableSensorEvents();
+  HRSensorEnable = false;
 }
 
 /*******************************************************
@@ -137,8 +143,7 @@ function sendAliveCommand () {
     Comm.transmit(dataArray, null, commListener);
   }
 }
-// Enable HR sensor - processing of result on the event handler
-//      enableHRSensor();
+
 class DFC_garmin_watchappView extends Ui.View {
   function initialize() {
     View.initialize();
@@ -146,6 +151,8 @@ class DFC_garmin_watchappView extends Ui.View {
     // Enable communications
     phoneMethod = method(:onPhone);
     Comm.registerForPhoneAppMessages(phoneMethod);
+
+//    Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
 
     timer1.start(method(:timer1Callback), 60*1000, true);
   }
@@ -208,8 +215,6 @@ class DFC_garmin_watchappView extends Ui.View {
   }
 
   // Draw the hash mark symbols on the watch
-  // @param dc Device contextComm.setM      // Enable HR sensor - processing of result on the event handler
-  //      enableHRSensor();ailboxListener(null);
   function drawHashMarks(dc) {
     var width = dc.getWidth();
     var height = dc.getHeight() - DISPLAY_HEIGHT_OFFSET;
@@ -282,9 +287,11 @@ class DFC_garmin_watchappView extends Ui.View {
       } else {
 	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 20)), Graphics.FONT_LARGE, "---", Gfx.TEXT_JUSTIFY_CENTER);
       }
-    } else {
+    } else if (clockTime.min != last_minute) {
+      last_minute = clockTime.min;
+
       // Enable HR sensor - processing of result on the event handler
-      enableHRSensor();
+//      enableHRSensor();
 
       secondsCounter++;
       if (secondsCounter >= 2) {
@@ -292,6 +299,8 @@ class DFC_garmin_watchappView extends Ui.View {
 	sendAliveCommand();
       }
     }
+
+//    System.println("onUpdate " + clockTime.min + ":" + clockTime.sec);
   }
 }
 
@@ -348,7 +357,7 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
       // Start the sport mode
       onSensorHRCounter = SPORT_MODE_MIN_TIME;
       enableHRSensor();
-  }
+    }
 
     return true;
   }
