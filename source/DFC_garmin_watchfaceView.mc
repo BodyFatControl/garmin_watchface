@@ -16,11 +16,21 @@ var timer1 = new Timer.Timer();
 var HR_value = 0;
 var HRSensorEnable = false;
 var sport_mode = false;
-const SPORT_MODE_MIN_TIME = 30; // in seconds
+const SPORT_MODE_MIN_TIME = 60; // in seconds
 var onSensorHRCounter = SPORT_MODE_MIN_TIME;
 var last_minute = -1;
+const DISPLAY_HEIGHT_OFFSET = 57;
 var screenWidth;
 var screenHeight;
+
+// Heart Rate Zones
+var HRmax;
+var zone1_HR_value;
+var zone2_HR_value;
+var zone3_HR_value;
+var zone4_HR_value;
+var zone5_HR_value;
+
 
 var secondsCounter = 0;
 
@@ -30,12 +40,22 @@ const HISTORIC_HR_COMMAND = 104030201;
 const ALIVE_COMMAND = 154030201;
 const USER_DATA_COMMAND = 204030201;
 
-const DISPLAY_HEIGHT_OFFSET = 57;
-
 // Seems a Garmin bug, because UTC time is UTC 00:00 Dec 31 1989
 //Unix UTC time: 1 January 1970
 //Garmin UTC time: 31 December 1989
 const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Time.Gregorian.SECONDS_PER_DAY;
+
+function CalcHRZones() {
+//  var currentYear = (Time.now() + GARMIN_UTC_OFFSET) / Time.Gregorian.SECONDS_PER_YEAR;
+//  var userProfile = UserProfile.getProfile();
+//  HRmax = 220 - (currentYear - userProfile.birthYear); // HRMax = 200 - UserAge
+//
+//  zone1_HR_value = HRmax *0.5;
+//  zone2_HR_value = HRmax *0.6;
+//  zone3_HR_value = HRmax *0.7;
+//  zone4_HR_value = HRmax *0.8;
+//  zone5_HR_value = HRmax *0.9;
+}
 
 function onSensorHR(sensor_info)
 {
@@ -152,7 +172,7 @@ class DFC_garmin_watchappView extends Ui.View {
     phoneMethod = method(:onPhone);
     Comm.registerForPhoneAppMessages(phoneMethod);
 
-//    Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
+    CalcHRZones();
 
     timer1.start(method(:timer1Callback), 60*1000, true);
   }
@@ -246,15 +266,18 @@ class DFC_garmin_watchappView extends Ui.View {
     height = dc.getHeight() - DISPLAY_HEIGHT_OFFSET;
 
     // Clear the screen
-    dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
+    if (sport_mode == false) {dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);}
+    else {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_WHITE);}
     dc.fillRectangle(0, 0, dc.getWidth(), dc.getHeight());
 
     // Draw lowest rectangle
-    dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+    if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);}
+    else {dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);}
     dc.fillRectangle(0, dc.getHeight() - DISPLAY_HEIGHT_OFFSET, dc.getWidth(), dc.getHeight());
 
     // Draw the numbers
-    dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+    if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);}
+    else {dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);}
     dc.drawText((width / 2), 0, font, "12", Gfx.TEXT_JUSTIFY_CENTER);
     dc.drawText(width - 2, (height / 2) - 15, font, "3", Gfx.TEXT_JUSTIFY_RIGHT);
     dc.drawText(width / 2, height - 28, font, "6", Gfx.TEXT_JUSTIFY_CENTER);
@@ -274,18 +297,46 @@ class DFC_garmin_watchappView extends Ui.View {
     drawMinutesHand(dc, minuteHandAngle);
 
     // Draw the arbor
-    dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+    if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);}
+    else {dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);}
     dc.fillCircle(width / 2, height / 2, 5);
-    dc.setColor(Gfx.COLOR_BLACK,Gfx.COLOR_BLACK);
     dc.drawCircle(width / 2, height / 2, 5);
 
     if (sport_mode == true) {
+      /********************************************/
+      // Draw HR zones graphs
+      //
+      dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT); // gray
+      var x_width = 28; // dc.getWidth() / 5; // 5 HR zones
+      var x = 0;
+      var y = screenHeight - 10; // height of the bars
+      var y_height = screenHeight;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      dc.setColor(0x00AAFF, Gfx.COLOR_TRANSPARENT); // blue
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      dc.setColor(0x00FF00, Gfx.COLOR_TRANSPARENT); // green
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      dc.setColor(0xFFAA00, Gfx.COLOR_TRANSPARENT); // orange
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      dc.setColor(0xFF0000, Gfx.COLOR_TRANSPARENT); // red
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      /********************************************/
+
       // Display the HR value
-      dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+      dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
       if (HR_value != 0) {
-	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 20)), Graphics.FONT_LARGE, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
+	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 10)), Graphics.FONT_LARGE, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
       } else {
-	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 20)), Graphics.FONT_LARGE, "---", Gfx.TEXT_JUSTIFY_CENTER);
+	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 10)), Graphics.FONT_LARGE, "---", Gfx.TEXT_JUSTIFY_CENTER);
       }
     } else if (clockTime.min != last_minute) {
       last_minute = clockTime.min;
