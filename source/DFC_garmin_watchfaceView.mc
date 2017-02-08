@@ -399,7 +399,14 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
   }
 
   function onBack() {
-    return pushDialog();
+    if (sport_mode == true) { // exit the sport mode
+      sport_mode = false;
+      disableHRSensor();
+      Ui.requestUpdate();
+      return true;
+    } else {
+      return pushDialog();
+    }
   }
 
   function onKey(evt) {
