@@ -24,13 +24,9 @@ var screenWidth;
 var screenHeight;
 
 // Heart Rate Zones
-var HRmax;
-var zone1_HR_value;
-var zone2_HR_value;
-var zone3_HR_value;
-var zone4_HR_value;
-var zone5_HR_value;
-
+var zone_HR_min;
+var zone_HR_max;
+var zone_HR_m_calc;
 
 var secondsCounter = 0;
 
@@ -46,15 +42,12 @@ const USER_DATA_COMMAND = 204030201;
 const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Time.Gregorian.SECONDS_PER_DAY;
 
 function CalcHRZones() {
-//  var currentYear = (Time.now() + GARMIN_UTC_OFFSET) / Time.Gregorian.SECONDS_PER_YEAR;
-//  var userProfile = UserProfile.getProfile();
-//  HRmax = 220 - (currentYear - userProfile.birthYear); // HRMax = 200 - UserAge
-//
-//  zone1_HR_value = HRmax *0.5;
-//  zone2_HR_value = HRmax *0.6;
-//  zone3_HR_value = HRmax *0.7;
-//  zone4_HR_value = HRmax *0.8;
-//  zone5_HR_value = HRmax *0.9;
+  var currentYear = (Time.now().value() / Time.Gregorian.SECONDS_PER_YEAR) + 1970;
+  var userProfile = UserProfile.getProfile();
+  zone_HR_max = 220 - (currentYear - userProfile.birthYear); // HRMax = 200 - UserAge
+  zone_HR_min = zone_HR_max / 2;
+
+  zone_HR_m_calc = 205.0 / (zone_HR_max - zone_HR_min); // screenWidth = 205 on VivoActive HR
 }
 
 function onSensorHR(sensor_info)
@@ -86,11 +79,11 @@ function onSensorHR(sensor_info)
 }
 
 function enableHRSensor() {
-//  if (HRSensorEnable == false) {
+  if (HRSensorEnable == false) {
     Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
     Sensor.enableSensorEvents(method(:onSensorHR));
     HRSensorEnable = true;
-//  }
+  }
 }
 
 function disableHRSensor() {
@@ -197,7 +190,7 @@ class DFC_garmin_watchappView extends Ui.View {
     var cos = Math.cos(angle);
     var sin = Math.sin(angle);
 
-    // Transform the coordina_tes
+    // Transform the coordinates
     for (var i = 0; i < 4; i += 1) {
       var x = (coords[i][0] * cos) - (coords[i][1] * sin);
       var y = (coords[i][0] * sin) + (coords[i][1] * cos);
@@ -309,7 +302,7 @@ class DFC_garmin_watchappView extends Ui.View {
       dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT); // gray
       var x_width = 28; // dc.getWidth() / 5; // 5 HR zones
       var x = 0;
-      var y = screenHeight - 10; // height of the bars
+      var y = screenHeight - 14; // height of the bars
       var y_height = screenHeight;
       dc.fillRectangle(x, y, x_width, y_height);
 
@@ -328,11 +321,25 @@ class DFC_garmin_watchappView extends Ui.View {
       dc.setColor(0xFF0000, Gfx.COLOR_TRANSPARENT); // red
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
+      /********************************************/
 
+      /********************************************/
+      // Draw HR zone indicator
+      //
+      // calc position of the indicator
+      var HR = HR_value;
+      if (HR < zone_HR_min) { HR = zone_HR_min; }
+      var y_pos_ind = (HR - zone_HR_min) * zone_HR_m_calc;
+      y_pos_ind = y_pos_ind.toNumber();
+
+      dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+      var x1 = y_pos_ind - 6; var y1 = screenHeight - 18;
+      var x2 = x1 + 13; var y2 = y1;
+      var x3 = x1 + 6; var y3 = y1 + 14;
+      dc.fillPolygon([[x1, y1], [x2, y2], [x3, y3]]);
       /********************************************/
 
       // Display the HR value
-      dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
       if (HR_value != 0) {
 	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 10)), Graphics.FONT_LARGE, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
       } else {
@@ -340,9 +347,6 @@ class DFC_garmin_watchappView extends Ui.View {
       }
     } else if (clockTime.min != last_minute) {
       last_minute = clockTime.min;
-
-      // Enable HR sensor - processing of result on the event handler
-//      enableHRSensor();
 
       secondsCounter++;
       if (secondsCounter >= 2) {
