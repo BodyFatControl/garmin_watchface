@@ -27,6 +27,7 @@ var screenHeight;
 var zone_HR_min;
 var zone_HR_max;
 var zone_HR_m_calc;
+var customFont = null;
 
 var secondsCounter = 0;
 
@@ -44,10 +45,10 @@ const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Ti
 function CalcHRZones() {
   var currentYear = (Time.now().value() / Time.Gregorian.SECONDS_PER_YEAR) + 1970;
   var userProfile = UserProfile.getProfile();
-  zone_HR_max = 220 - (currentYear - userProfile.birthYear); // HRMax = 200 - UserAge
+  zone_HR_max = 220 - (currentYear - userProfile.birthYear); // HRMax = 220 - UserAge
   zone_HR_min = zone_HR_max / 2;
 
-  zone_HR_m_calc = 205.0 / (zone_HR_max - zone_HR_min); // screenWidth = 205 on VivoActive HR
+  zone_HR_m_calc = 148.0 / (zone_HR_max - zone_HR_min); // screenWidth = 148 on VivoActive HR
 }
 
 function onSensorHR(sensor_info)
@@ -167,6 +168,8 @@ class DFC_garmin_watchappView extends Ui.View {
 
     CalcHRZones();
 
+    customFont = Ui.loadResource(Rez.Fonts.roboto_bold_36);
+
     timer1.start(method(:timer1Callback), 60*1000, true);
   }
 
@@ -261,13 +264,20 @@ class DFC_garmin_watchappView extends Ui.View {
     // Clear the screen
     if (sport_mode == false) {dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);}
     else {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_WHITE);}
-    dc.fillRectangle(0, 0, dc.getWidth(), dc.getHeight());
+    dc.fillRectangle(0, 0, screenWidth, screenHeight);
 
     // Draw lowest rectangle
-    if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);}
-    else {dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);}
-    dc.fillRectangle(0, dc.getHeight() - DISPLAY_HEIGHT_OFFSET, dc.getWidth(), dc.getHeight());
-
+    if (sport_mode == false) {
+      dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+      dc.fillRectangle(0, screenHeight - DISPLAY_HEIGHT_OFFSET, screenWidth, screenHeight - DISPLAY_HEIGHT_OFFSET + 4);
+      dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
+      dc.fillRectangle(0, screenHeight - DISPLAY_HEIGHT_OFFSET + 4, screenWidth, screenHeight);
+	}
+    else {
+	  dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
+	  dc.fillRectangle(0, screenHeight - DISPLAY_HEIGHT_OFFSET, screenWidth, screenHeight);
+	}
+    
     // Draw the numbers
     if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);}
     else {dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);}
@@ -300,9 +310,9 @@ class DFC_garmin_watchappView extends Ui.View {
       // Draw HR zones graphs
       //
       dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT); // gray
-      var x_width = 28; // dc.getWidth() / 5; // 5 HR zones
-      var x = 0;
-      var y = screenHeight - 14; // height of the bars
+      var x_width = 25; // dc.getWidth() 148 / 5; // 5 HR zones
+      var x = 7;
+      var y = screenHeight - 12; // height of the bars
       var y_height = screenHeight;
       dc.fillRectangle(x, y, x_width, y_height);
 
@@ -329,33 +339,58 @@ class DFC_garmin_watchappView extends Ui.View {
       // calc position of the indicator
       var HR = HR_value;
       if (HR < zone_HR_min) { HR = zone_HR_min; }
-      var y_pos_ind = (HR - zone_HR_min) * zone_HR_m_calc;
-      y_pos_ind = y_pos_ind.toNumber();
+      else if (HR >= zone_HR_max) { HR = zone_HR_max; }
+      var pos_ind = ((HR - zone_HR_min) * zone_HR_m_calc) + 7;
+      pos_ind = pos_ind.toNumber();
 
       dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-      var x1 = y_pos_ind - 6; var y1 = screenHeight - 18;
-      var x2 = x1 + 13; var y2 = y1;
-      var x3 = x1 + 6; var y3 = y1 + 14;
+      var x1 = pos_ind - 7; var y1 = screenHeight - 14;
+      var x2 = x1 + 15; var y2 = y1;
+      var x3 = x1 + 7; var y3 = y1 + 12;
       dc.fillPolygon([[x1, y1], [x2, y2], [x3, y3]]);
       /********************************************/
 
       // Display the HR value
       if (HR_value != 0) {
-	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 10)), Graphics.FONT_LARGE, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
+	    dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET + 0)), customFont, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
       } else {
-	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 10)), Graphics.FONT_LARGE, "---", Gfx.TEXT_JUSTIFY_CENTER);
+	    dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET + 0)), customFont, "---", Gfx.TEXT_JUSTIFY_CENTER);
       }
+
     } else if (clockTime.min != last_minute) {
-      last_minute = clockTime.min;
+      /********************************************/
+      // Draw calories zones graphs
+      //
+      dc.setColor(0xFF0000, Gfx.COLOR_TRANSPARENT); // red
+      var x_width = 25; // dc.getWidth() 148 / 5; // 5 zones
+      var x = 7;
+      var y = screenHeight - 12; // height of the bars
+      var y_height = screenHeight;
+      dc.fillRectangle(x, y, x_width, y_height);
 
-      secondsCounter++;
-      if (secondsCounter >= 2) {
-	secondsCounter = 0;
-	sendAliveCommand();
-      }
+      dc.setColor(0xFFAA00, Gfx.COLOR_TRANSPARENT); // orange
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      dc.setColor(0xFFFF00, Gfx.COLOR_TRANSPARENT); // yellow
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      dc.setColor(0x00FF00, Gfx.COLOR_TRANSPARENT); // green      
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      dc.setColor(0x00AAFF, Gfx.COLOR_TRANSPARENT); // blue      
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+      /********************************************/
+    
+	  secondsCounter++;
+	  if (secondsCounter >= 2) {
+	    secondsCounter = 0;
+	    sendAliveCommand();
+	  }
     }
-
-//    System.println("onUpdate " + clockTime.min + ":" + clockTime.sec);
   }
 }
 
