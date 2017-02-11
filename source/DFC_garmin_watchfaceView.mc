@@ -27,6 +27,9 @@ var screenHeight;
 var zone_HR_min;
 var zone_HR_max;
 var zone_HR_m_calc;
+const HR_INDICATOR_WIDTH = 15;
+const HR_INDICATOR_WIDTH_HALF = 7;
+const HR_INDICATOR_HEIGHT = 12;
 var customFont = null;
 
 var secondsCounter = 0;
@@ -48,7 +51,7 @@ function CalcHRZones() {
   zone_HR_max = 220 - (currentYear - userProfile.birthYear); // HRMax = 220 - UserAge
   zone_HR_min = zone_HR_max / 2;
 
-  zone_HR_m_calc = 148.0 / (zone_HR_max - zone_HR_min); // screenWidth = 148 on VivoActive HR
+  zone_HR_m_calc = (148.0 - HR_INDICATOR_WIDTH) / (zone_HR_max - zone_HR_min); // screenWidth = 148 on VivoActive HR
 }
 
 function onSensorHR(sensor_info)
@@ -339,14 +342,17 @@ class DFC_garmin_watchappView extends Ui.View {
       // calc position of the indicator
       var HR = HR_value;
       if (HR < zone_HR_min) { HR = zone_HR_min; }
-      else if (HR >= zone_HR_max) { HR = zone_HR_max; }
-      var pos_ind = ((HR - zone_HR_min) * zone_HR_m_calc) + 7;
+      else if (HR > zone_HR_max) { HR = zone_HR_max; }
+      var pos_ind = ((HR - zone_HR_min) * zone_HR_m_calc) + HR_INDICATOR_WIDTH_HALF;
       pos_ind = pos_ind.toNumber();
 
       dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
-      var x1 = pos_ind - 7; var y1 = screenHeight - 14;
-      var x2 = x1 + 15; var y2 = y1;
-      var x3 = x1 + 7; var y3 = y1 + 12;
+      var x1 = pos_ind - HR_INDICATOR_WIDTH_HALF;
+      var y1 = screenHeight - 14;
+      var x2 = x1 + HR_INDICATOR_WIDTH;
+      var y2 = y1;
+      var x3 = x1 + HR_INDICATOR_WIDTH_HALF;
+      var y3 = y1 + HR_INDICATOR_HEIGHT;
       dc.fillPolygon([[x1, y1], [x2, y2], [x3, y3]]);
       /********************************************/
 
