@@ -34,11 +34,27 @@ var customFont = null;
 
 var secondsCounter = 0;
 
+const COLOR_GRAY_1 = 0xAAAAAA;
+const COLOR_GRAY_2 = 0x555555;
+const COLOR_BLUE_1 = 0x00AAFF;
+const COLOR_BLUE_2 = 0x0055FF;
+const COLOR_GREEN_1 = 0x00FF00;
+const COLOR_GREEN_2 = 0x00AA00;
+const COLOR_ORANGE_1 = 0xFFAA00;
+const COLOR_ORANGE_2 = 0xFF5500;
+const COLOR_RED_1 = 0xFF0000;
+const COLOR_RED_2 = 0xAA0000;
+const COLOR_YELLOW_1 = 0xFFFFAA;
+const COLOR_YELLOW_2 = 0xFFFF00;
+
 var clockTime = Sys.getClockTime();
 
 const HISTORIC_HR_COMMAND = 104030201;
 const ALIVE_COMMAND = 154030201;
 const USER_DATA_COMMAND = 204030201;
+const CALORIES_BALANCE_COMMAND = 304030201;
+
+var caloriesBalance = 0;
 
 // Seems a Garmin bug, because UTC time is UTC 00:00 Dec 31 1989
 //Unix UTC time: 1 January 1970
@@ -119,20 +135,24 @@ function onPhone(msg) {
       // Starting building the command response
       dataArray.add(HISTORIC_HR_COMMAND);
       while (HRSample != null) {
-	date = HRSample.when.value() + GARMIN_UTC_OFFSET;
-	if (date > startDate) {
-	  var tempHR = HRSample.data;
-	  if (tempHR == null) {
-	    HRSample = HRSensorHistoryIterator.next();
-	    continue;
-	  }
-	  dataArray.add(date);
-	  dataArray.add(HRSample.data);
-	  HRSample = HRSensorHistoryIterator.next();
-	} else {
-	  break;
-	}
-      }
+		date = HRSample.when.value() + GARMIN_UTC_OFFSET;
+		if (date > startDate) {
+		  	var tempHR = HRSample.data;
+		  	if (tempHR == null) {
+		      HRSample = HRSensorHistoryIterator.next();
+		      continue;
+		    }
+		  dataArray.add(date);
+		  dataArray.add(HRSample.data);
+		  HRSample = HRSensorHistoryIterator.next();
+			} else {
+			  break;
+			}
+      	}
+  	  // Transmit command response
+      sendCommBusy = true;
+      Comm.transmit(dataArray, null, commListener);
+      
     } else if (msg.data[0] == USER_DATA_COMMAND) {
       // Get the parameters from the command
       var userProfile = UserProfile.getProfile();
@@ -143,11 +163,14 @@ function onPhone(msg) {
       dataArray.add(userProfile.height);
       dataArray.add(userProfile.weight);
       dataArray.add(userProfile.activityClass);
+      // Transmit command response
+      sendCommBusy = true;
+      Comm.transmit(dataArray, null, commListener);
+      
+    } else if (msg.data[0] == CALORIES_BALANCE_COMMAND) {
+	  caloriesBalance= msg.data[1];
+	  Ui.requestUpdate();
     }
-
-    // Transmit command response
-    sendCommBusy = true;
-    Comm.transmit(dataArray, null, commListener);
   }
 }
 
@@ -172,6 +195,7 @@ class DFC_garmin_watchappView extends Ui.View {
     CalcHRZones();
 
     customFont = Ui.loadResource(Rez.Fonts.roboto_bold_36);
+//    customFont = Graphics.FONT_LARGE;
 
     timer1.start(method(:timer1Callback), 60*1000, true);
   }
@@ -271,19 +295,16 @@ class DFC_garmin_watchappView extends Ui.View {
 
     // Draw lowest rectangle
     if (sport_mode == false) {
-      dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-      dc.fillRectangle(0, screenHeight - DISPLAY_HEIGHT_OFFSET, screenWidth, screenHeight - DISPLAY_HEIGHT_OFFSET + 4);
-      dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
-      dc.fillRectangle(0, screenHeight - DISPLAY_HEIGHT_OFFSET + 4, screenWidth, screenHeight);
-	}
-    else {
+ 	  dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+	  dc.fillRectangle(0, screenHeight - DISPLAY_HEIGHT_OFFSET, screenWidth, screenHeight);
+	} else {
 	  dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);
 	  dc.fillRectangle(0, screenHeight - DISPLAY_HEIGHT_OFFSET, screenWidth, screenHeight);
 	}
     
     // Draw the numbers
     if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);}
-    else {dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);}
+    else {dc.setColor(COLOR_GRAY_1, Gfx.COLOR_TRANSPARENT);}
     dc.drawText((width / 2), 0, font, "12", Gfx.TEXT_JUSTIFY_CENTER);
     dc.drawText(width - 2, (height / 2) - 15, font, "3", Gfx.TEXT_JUSTIFY_RIGHT);
     dc.drawText(width / 2, height - 28, font, "6", Gfx.TEXT_JUSTIFY_CENTER);
@@ -304,7 +325,7 @@ class DFC_garmin_watchappView extends Ui.View {
 
     // Draw the arbor
     if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);}
-    else {dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT);}
+    else {dc.setColor(COLOR_GRAY_1, Gfx.COLOR_TRANSPARENT);}
     dc.fillCircle(width / 2, height / 2, 5);
     dc.drawCircle(width / 2, height / 2, 5);
 
@@ -312,26 +333,26 @@ class DFC_garmin_watchappView extends Ui.View {
       /********************************************/
       // Draw HR zones graphs
       //
-      dc.setColor(0xAAAAAA, Gfx.COLOR_TRANSPARENT); // gray
+      dc.setColor(COLOR_GRAY_2, Gfx.COLOR_TRANSPARENT); // gray
       var x_width = 25; // dc.getWidth() 148 / 5; // 5 HR zones
       var x = 7;
       var y = screenHeight - 12; // height of the bars
       var y_height = screenHeight;
       dc.fillRectangle(x, y, x_width, y_height);
 
-      dc.setColor(0x00AAFF, Gfx.COLOR_TRANSPARENT); // blue
+      dc.setColor(COLOR_BLUE_2, Gfx.COLOR_TRANSPARENT); // blue
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
 
-      dc.setColor(0x00FF00, Gfx.COLOR_TRANSPARENT); // green
+      dc.setColor(COLOR_GREEN_2, Gfx.COLOR_TRANSPARENT); // green
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
 
-      dc.setColor(0xFFAA00, Gfx.COLOR_TRANSPARENT); // orange
+      dc.setColor(COLOR_ORANGE_2, Gfx.COLOR_TRANSPARENT); // orange
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
 
-      dc.setColor(0xFF0000, Gfx.COLOR_TRANSPARENT); // red
+      dc.setColor(COLOR_RED_2, Gfx.COLOR_TRANSPARENT); // red
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
       /********************************************/
@@ -367,29 +388,58 @@ class DFC_garmin_watchappView extends Ui.View {
       /********************************************/
       // Draw calories zones graphs
       //
-      dc.setColor(0xFF0000, Gfx.COLOR_TRANSPARENT); // red
-      var x_width = 25; // dc.getWidth() 148 / 5; // 5 zones
+      dc.setColor(COLOR_RED_2, Gfx.COLOR_TRANSPARENT);
+      var x_width = 25; // 5 zones
       var x = 7;
       var y = screenHeight - 12; // height of the bars
       var y_height = screenHeight;
       dc.fillRectangle(x, y, x_width, y_height);
 
-      dc.setColor(0xFFAA00, Gfx.COLOR_TRANSPARENT); // orange
+      dc.setColor(COLOR_ORANGE_2, Gfx.COLOR_TRANSPARENT);
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+      
+      dc.setColor(COLOR_YELLOW_2, Gfx.COLOR_TRANSPARENT);
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
 
-      dc.setColor(0xFFFF00, Gfx.COLOR_TRANSPARENT); // yellow
+      dc.setColor(COLOR_GREEN_2, Gfx.COLOR_TRANSPARENT);
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
 
-      dc.setColor(0x00FF00, Gfx.COLOR_TRANSPARENT); // green      
-      x += x_width + 2;
-      dc.fillRectangle(x, y, x_width, y_height);
-
-      dc.setColor(0x00AAFF, Gfx.COLOR_TRANSPARENT); // blue      
+      dc.setColor(COLOR_BLUE_2, Gfx.COLOR_TRANSPARENT);      
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
       /********************************************/
+      
+      /********************************************/
+      // Draw the zone indicator
+      //
+      // calc position of the indicator
+      var HR = HR_value;
+      HR = 150;
+      if (HR < zone_HR_min) { HR = zone_HR_min; }
+      else if (HR > zone_HR_max) { HR = zone_HR_max; }
+      var pos_ind = ((HR - zone_HR_min) * zone_HR_m_calc) + HR_INDICATOR_WIDTH_HALF;
+      pos_ind = pos_ind.toNumber();
+
+      dc.setColor(COLOR_GRAY_1, Gfx.COLOR_TRANSPARENT);
+      var x1 = pos_ind - HR_INDICATOR_WIDTH_HALF;
+      var y1 = screenHeight - 14;
+      var x2 = x1 + HR_INDICATOR_WIDTH;
+      var y2 = y1;
+      var x3 = x1 + HR_INDICATOR_WIDTH_HALF;
+      var y3 = y1 + HR_INDICATOR_HEIGHT;
+      dc.fillPolygon([[x1, y1], [x2, y2], [x3, y3]]);
+      /********************************************/
+            
+      // Display the calories balance value
+      if (caloriesBalance != 0) {
+      	if (caloriesBalance < 0) { dc.setColor(COLOR_RED_2, Gfx.COLOR_TRANSPARENT); }
+	    dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET + 0)), customFont, caloriesBalance, Gfx.TEXT_JUSTIFY_CENTER);
+      } else {
+	    dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET + 0)), customFont, "----", Gfx.TEXT_JUSTIFY_CENTER);
+      }
     
 	  secondsCounter++;
 	  if (secondsCounter >= 2) {
