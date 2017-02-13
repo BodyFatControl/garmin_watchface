@@ -62,6 +62,8 @@ var caloriesBalanceScale = 1;
 //Garmin UTC time: 31 December 1989
 const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Time.Gregorian.SECONDS_PER_DAY;
 
+const CUSTOM_FONT = false; // true to use the customFont but code needs to be built on Windows only :-(
+
 function CalcHRZones() {
   var currentYear = (Time.now().value() / Time.Gregorian.SECONDS_PER_YEAR) + 1970;
   var userProfile = UserProfile.getProfile();
@@ -196,8 +198,11 @@ class DFC_garmin_watchappView extends Ui.View {
 
     CalcHRZones();
 
-//    customFont = Ui.loadResource(Rez.Fonts.roboto_bold_36);
-    customFont = Graphics.FONT_LARGE;
+    if (CUSTOM_FONT == true) {
+      customFont = Ui.loadResource(Rez.Fonts.roboto_bold_36);
+    } else {
+      customFont = Graphics.FONT_LARGE;
+    }
 
     timer1.start(method(:timer1Callback), 60*1000, true);
   }
@@ -338,7 +343,7 @@ class DFC_garmin_watchappView extends Ui.View {
       dc.setColor(COLOR_GRAY_1, Gfx.COLOR_TRANSPARENT); // gray
       var x_width = 25; // dc.getWidth() 148 / 5; // 5 HR zones
       var x = INDICATOR_WIDTH_HALF;
-      var y = screenHeight - 12; // height of the bars
+      var y = screenHeight - 10; // height of the bars
       var y_height = screenHeight;
       dc.fillRectangle(x, y, x_width, y_height);
 
@@ -371,7 +376,7 @@ class DFC_garmin_watchappView extends Ui.View {
 
       dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
       var x1 = pos_ind - INDICATOR_WIDTH_HALF;
-      var y1 = screenHeight - 14;
+      var y1 = screenHeight - 12;
       var x2 = x1 + INDICATOR_WIDTH;
       var y2 = y1;
       var x3 = x1 + INDICATOR_WIDTH_HALF;
@@ -381,24 +386,28 @@ class DFC_garmin_watchappView extends Ui.View {
 
       // Display the HR value
       if (HR_value != 0) {
-	    dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET + 0)), customFont, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
+	if (CUSTOM_FONT == true) {
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET)), customFont, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
+	} else {
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 8)), customFont, HR_value, Gfx.TEXT_JUSTIFY_CENTER);
+	}
       } else {
-	    dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET + 0)), customFont, "---", Gfx.TEXT_JUSTIFY_CENTER);
+	if (CUSTOM_FONT == true) {
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET)), customFont, "---", Gfx.TEXT_JUSTIFY_CENTER);
+	} else {
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 8)), customFont, "---", Gfx.TEXT_JUSTIFY_CENTER);
+	}
       }
 
     } else if (clockTime.min != last_minute) {
       /********************************************/
       // Draw calories zones graphs
       //
-      dc.setColor(COLOR_RED_1, Gfx.COLOR_TRANSPARENT);
+      dc.setColor(COLOR_ORANGE_2, Gfx.COLOR_TRANSPARENT);
       var x_width = 32; // 4 zones
       var x = INDICATOR_WIDTH_HALF;
-      var y = screenHeight - 12; // height of the bars
+      var y = screenHeight - 10; // height of the bars
       var y_height = screenHeight;
-      dc.fillRectangle(x, y, x_width, y_height);
-
-      dc.setColor(COLOR_ORANGE_1, Gfx.COLOR_TRANSPARENT);
-      x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
      
       dc.setColor(COLOR_GREEN_1, Gfx.COLOR_TRANSPARENT);
@@ -406,6 +415,10 @@ class DFC_garmin_watchappView extends Ui.View {
       dc.fillRectangle(x, y, x_width, y_height);
 
       dc.setColor(COLOR_BLUE_1, Gfx.COLOR_TRANSPARENT);      
+      x += x_width + 2;
+      dc.fillRectangle(x, y, x_width, y_height);
+
+      dc.setColor(COLOR_GRAY_1, Gfx.COLOR_TRANSPARENT);
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);
       /********************************************/
@@ -420,25 +433,33 @@ class DFC_garmin_watchappView extends Ui.View {
       caloriesIndicator = caloriesIndicator.toNumber();
 
       dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-      var x1 = (bar_with/2) + caloriesIndicator;
+      var x1 = (bar_with/4) + caloriesIndicator;
       // impose limits
       if (x1 > bar_with) { x1 = bar_with; }
       else if (x1 < INDICATOR_WIDTH) { x1 = INDICATOR_WIDTH; }
 
-      var y1 = screenHeight - 14;
+      var y1 = screenHeight - 12;
       var x2 = x1 + INDICATOR_WIDTH;
       var y2 = y1;
       var x3 = x1 + INDICATOR_WIDTH_HALF;
       var y3 = y1 + INDICATOR_HEIGHT;
       dc.fillPolygon([[x1, y1], [x2, y2], [x3, y3]]);
       /********************************************/
-            
+
       // Display the calories balance value
       if (caloriesBalance != 0) {
-      	if (caloriesBalance < 0) { dc.setColor(0xFF0055, Gfx.COLOR_TRANSPARENT); }
-	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET + 0)), customFont, caloriesBalance, Gfx.TEXT_JUSTIFY_CENTER);
+	if (caloriesBalance < 0) { dc.setColor(0xFF0055, Gfx.COLOR_TRANSPARENT); }
+	if (CUSTOM_FONT == true) {
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET)), customFont, caloriesBalance, Gfx.TEXT_JUSTIFY_CENTER);
+	} else {
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 8)), customFont, caloriesBalance, Gfx.TEXT_JUSTIFY_CENTER);
+	}
       } else {
-	dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET + 0)), customFont, "----", Gfx.TEXT_JUSTIFY_CENTER);
+	if (CUSTOM_FONT == true) {
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET)), customFont, "----", Gfx.TEXT_JUSTIFY_CENTER);
+	} else {
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 8)), customFont, "----", Gfx.TEXT_JUSTIFY_CENTER);
+	}
       }
     
       secondsCounter++;
