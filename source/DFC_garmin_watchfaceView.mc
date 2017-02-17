@@ -554,13 +554,12 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
  *
  */
 
-const CALS_ARRAY_SIZE = 4 * 1000; // (8 kbytes - 192 bytes) size || ONLY 4000 bytes...
-const CALS_ARRAY_DATA_SIZE = 4; // each int stored equals to 4 bytes
+const CALS_ARRAY_SIZE = 1550; // each element is 4 bytes: 1550*4 = ~6kbytes <-- higher value will not work
 const PROPERTY_CALS_ARRAY_KEY = 1;
-const PROPERTY_CALS_ARRAY_START_POS_KEY = 2;
-const PROPERTY_CALS_ARRAY_START_TIME_KEY = 3;
-const PROPERTY_CALS_ARRAY_END_POS_KEY = 4;
-const PROPERTY_CALS_ARRAY_END_TIME_KEY = 5;
+const PROPERTY_CALS_ARRAY_END_POS_KEY = 2;
+const PROPERTY_CALS_ARRAY_END_TIME_KEY = 3;
+const PROPERTY_CALS_ARRAY_START_POS_KEY = 4;
+const PROPERTY_CALS_ARRAY_START_TIME_KEY = 5;
 
 var calsArray = null;
 var calsArrayStartPos = 0;
@@ -569,142 +568,116 @@ var calsArrayEndPos = 0;
 var calsArrayEndTime = 0;
 
 function initStorage () {
-  var array = new [20];
+  var calsPerMinute = 0;
 
-  array[0] = 100;
-  array[1] = 101;
-  array[2] = 102;
-  array[3] = 0.1;
-  array[4] = 0.2;
-  array[5] = "abc";
-
-  System.println("array " + array);
-
-//  var calsPerMinute = 0;
-//
-//  // Initialize var from the values on store object
-//  var app = App.getApp();
-//
-//  calsArray = app.getProperty(PROPERTY_CALS_ARRAY_KEY);
-//
+  // Initialize var from the values on store object
+  var app = App.getApp();
+  calsArray = app.getProperty(PROPERTY_CALS_ARRAY_KEY);
 //app.clearProperties();
 //calsArray = null;
-//  if (calsArray == null) { // should happen only on the very first time the app runs
-//    calsArray = new [CALS_ARRAY_SIZE];
-//
-//    /* ************************************************
-//     * Fill the array with default value of calories
-//     */
-//    calsPerMinute = 1;// getCalsPerMinute (0); // default HR of 0
-//
-//    // start at current time and go backwards
-//    calsArrayEndPos = CALS_ARRAY_SIZE - 1;
-//    calsArrayEndTime = Time.now().value() / 60;
-//
-//    var i = CALS_ARRAY_SIZE;
-//    do {
-//      i -= CALS_ARRAY_DATA_SIZE;
-//      calsArray[i] = calsPerMinute;
-//    } while (i != 0);
-//
-//    calsArrayStartPos = 0;
-//    calsArrayStartTime = calsArrayEndTime - CALS_ARRAY_SIZE;
-//
-//    return; // array and all variables should be correct initialized
-//  }
-//
-//  calsArrayStartPos = app.getProperty(PROPERTY_CALS_ARRAY_START_POS_KEY);
-//  calsArrayStartTime = app.getProperty(PROPERTY_CALS_ARRAY_START_TIME_KEY);
-//  calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
-//  calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
-//
-//  var nowMinutes = Time.now().value() / 60;
-//System.println("nowMinutes " + nowMinutes);
-//  var minutesLeftInArray = nowMinutes - calsArrayEndTime;
-//System.println("minutesLeftInArray " + minutesLeftInArray);
-//  if (minutesLeftInArray > 0) { // need to update the array
-//    if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
-//
-//    // **********************************************************
-//    // Prepare HR Sensor history
-//    var targetMinute = nowMinutes - minutesLeftInArray;
-//System.println("targetMinute " + targetMinute);
-//    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
-//   	  {
-//   	  //Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
-//   	      //:period => new Toybox.Time.Duration.initiavar lize(5*60)
-//   	      :order => SensorHistory.ORDER_OLDEST_FIRST
-//   	  });
-//
-//
-//    // loop until get a value starting at date we are looking for
-//    var HRSample = HRSensorHistoryIterator.next();
-//    var maxSamples = 148; // vivoactive HR max samples = 148
-//    var date = 0;
-//    while (maxSamples > 0) {
-//      maxSamples--;
-//
-//      if (HRSample != null) {
-//	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
-//	if (date > targetMinute) {
-//System.println("SensorHistory date " + date);
-//	  break; // leave this while loop cycle
-//	}
-//      }
-//
-//      HRSample = HRSensorHistoryIterator.next();
-//    }
-//    // **********************************************************
-//
-//    var HR = 0;
-//    while (minutesLeftInArray > 0) {
-//      minutesLeftInArray--;
-//
-//      // Manage the array pointer bondaries
-//      if (calsArrayEndPos >= (CALS_ARRAY_SIZE - CALS_ARRAY_DATA_SIZE)) {
-//	calsArrayEndPos = 0;
-//      } else {
-//	calsArrayEndPos += CALS_ARRAY_DATA_SIZE;
-//      }
-//
-//      if (calsArrayStartPos >= (CALS_ARRAY_SIZE - CALS_ARRAY_DATA_SIZE)) {
-//	calsArrayStartPos = 0;
-//      } else {
-//	calsArrayStartPos += CALS_ARRAY_DATA_SIZE;
-//      }
-//
-//      // **********************************************************
-//      // get the new values of calories and put on the array
-//      if (HRSample != null) {
-//     	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
-//     	if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
-//	  HR = HRSample.data;
-//System.println("HR " + HR);
-//     	}
-//      } else {
-//	HR = 0;
-//      }
-//      HRSample = HRSensorHistoryIterator.next();
-//      targetMinute++;
-//      calsPerMinute += 1; // getCalsPerMinute (HR);
+  if (calsArray == null) { // should happen only on the very first time the app runs
+    calsArray = new [CALS_ARRAY_SIZE];
+
+    /* ************************************************
+     * Fill the array with default value of calories
+     */
+    calsPerMinute = getCalsPerMinute (0); // default HR of 0
+
+    // start at current time and go backwards
+    calsArrayStartPos = 0;
+    calsArrayStartTime = calsArrayEndTime - CALS_ARRAY_SIZE;
+    calsArrayEndPos = CALS_ARRAY_SIZE - 1;
+    calsArrayEndTime = Time.now().value() / 60;
+
+    for (var i = 0; i < CALS_ARRAY_SIZE; i++) {
+      calsArray[i] = calsPerMinute;
+    }
+
+    return; // array and all variables should be correct initialized
+  }
+
+  calsArrayStartPos = app.getProperty(PROPERTY_CALS_ARRAY_START_POS_KEY);
+  calsArrayStartTime = app.getProperty(PROPERTY_CALS_ARRAY_START_TIME_KEY);
+  calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
+  calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
+
+  var nowMinutes = Time.now().value() / 60;
+  var minutesLeftInArray = nowMinutes - calsArrayEndTime;
+System.println("minutesLeftInArray " + minutesLeftInArray);
+  if (minutesLeftInArray > 0) { // need to update the array
+    if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
+
+    // **********************************************************
+    // Prepare HR Sensor history
+    var targetMinute = nowMinutes - minutesLeftInArray;
+System.println("targetMinute " + targetMinute);
+    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
+   	  {
+   	  //Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
+   	      //:period => new Toybox.Time.Duration.initiavar lize(5*60)
+   	      :order => SensorHistory.ORDER_OLDEST_FIRST
+   	  });
+
+
+    // loop until get a value starting at date we are looking for
+    var HRSample = HRSensorHistoryIterator.next();
+    var maxSamples = 148; // vivoactive HR max samples = 148
+    var date = 0;
+    while (maxSamples > 0) {
+      maxSamples--;
+
+      if (HRSample != null) {
+	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+	if (date > targetMinute) {
+System.println("SensorHistory date " + date);
+	  break; // leave this while loop cycle
+	}
+      }
+
+      HRSample = HRSensorHistoryIterator.next();
+    }
+    // **********************************************************
+
+    var HR = 0;
+    while (minutesLeftInArray > 0) {
+      minutesLeftInArray--;
+
+      // Manage the array pointer bondaries
+      if (calsArrayEndPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayEndPos = 0; }
+      else { calsArrayEndPos++; }
+      if (calsArrayStartPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayStartPos = 0; }
+      else { calsArrayStartPos++; }
+
+      // **********************************************************
+      // get the new values of calories and put on the array
+      if (HRSample != null) {
+     	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+     	if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
+	  HR = HRSample.data;
+System.println("HR " + HR);
+     	}
+      } else {
+	HR = 0;
+      }
+      HRSample = HRSensorHistoryIterator.next();
+      targetMinute++;
+      calsPerMinute = getCalsPerMinute (HR);
 //System.println("calsPerMinute " + calsPerMinute);
-//      // **********************************************************
-//
-//      calsArray[calsArrayEndPos] = calsPerMinute;
-//      calsArrayEndTime++;
-//      calsArrayStartTime++;
-//    }
-//
+      // **********************************************************
+
+      calsArray[calsArrayEndPos] = calsPerMinute;
+      calsArrayEndTime++;
+      calsArrayStartTime++;
+    }
+
 //System.println("calsArray " + calsArray);
-//
-//    return; // array and all variables should be correct initialized
-//  }
+    return; // array and all variables should be correct initialized
+  }
 }
 
 function saveStorage () {
    // Save now the values on store object
   var app = App.getApp();
-//System.println("array size " + calsArray.size());
 //System.println("calsArray " + calsArray);
   app.setProperty(PROPERTY_CALS_ARRAY_KEY, calsArray);
   app.setProperty(PROPERTY_CALS_ARRAY_START_POS_KEY, calsArrayStartPos);
@@ -713,3 +686,89 @@ function saveStorage () {
   app.setProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY, calsArrayEndTime);
 }
 
+/* ****************************************************************************
+ * ****************************************************************************
+ * ****************************************************************************/
+
+/* ****************************************************************************
+ * ****************************************************************************
+ * ****************************************************************************
+ *
+ * Calories
+ *
+ */
+
+/*
+  EER:
+  Your EER (Estimated Energy Requirements) are the number of estimated  calories that you burn
+  based on your BMR plus calories from a typical  non-exercise day, such as getting ready for
+  work, working at a desk job  for 8 hours, and stopping by the store on the way home. EER is
+  based on a  formula published by the FDA and used by other government agencies to  estimate the
+  calories required by an individual based on their age,  height, weight, and gender. Your EER is
+  greater than your BMR since your  BMR only takes into account the calories burned by your body
+  just for  it to exist.
+  MALE: EER = 864 - 9.72 x age(years) + 1.0 x (14.2 x weight(kg) + 503 x height(meters))
+  FEMALE: EER = 387 - 7.31 x age(years) + 1.0 x (10.9 x weight(kg) + 660.7 x height(meters))
+
+  Calories over and including 90 HR:
+  This is the Formula when you don't know the VO2max (Maximal oxygen consumption):
+  Male:((-55.0969 + (0.6309 x HR) + (0.1988 x W) + (0.2017 x A))/4.184) x 60 x T
+  Female:((-20.4022 + (0.4472 x HR) - (0.1263 x W) + (0.074 x A))/4.184) x 60 x T
+  HR = Heart rate (in beats/minute)
+  W = Weight (in kilograms)
+  A = Age (in years)
+  T = Exercise duration time (in hours)
+*/
+
+var UserAge = 0;
+var UserWeight = 0;
+var UserHeight = 0;
+var EERcals = 0;
+
+function initEERCals () {
+  var currentYear = (Time.now().value() / Time.Gregorian.SECONDS_PER_YEAR) + 1970;
+  var userProfile = UserProfile.getProfile();
+  var UserAge = currentYear - userProfile.birthYear; // years
+  var UserWeight = userProfile.weight / 1000.0; // kg
+  var UserHeight = userProfile.height / 100.0; // meters
+
+  //EER
+  if (userProfile.gender == UserProfile.GENDER_FEMALE) { // female
+    EERcals = ((387 - (7.31*UserAge) + (1.0*(10.9*UserWeight)) + (660.7*UserHeight))); // daily value
+  } else { // male
+    EERcals = ((864 - (9.72*UserAge) + (1.0*(14.2*UserWeight)) + (503*UserHeight)));
+  }
+
+  EERcals /= 24.0 * 60.0; // per minute value of the day
+  EERcals *= 1000;
+  EERcals = EERcals.toNumber(); // int value and 1000x the real value
+
+System.println("EERcals " + EERcals);
+}
+
+function getCalsPerMinute (HR) {
+//
+//
+//  //With HR >= 90
+//  double hr = (double) hr_value;
+//  double calories;
+//  if (hr >= 90 && hr < 255) { // calculation based on formula without VO2max
+//      if (gender == 0) { // female
+//          calories = (-20.4022 + (0.4472*hr) - (0.1263*weight/1000) +
+//                  (0.074*age));
+//          calories = calories / 4.184;
+//
+//      } else { // male
+//          calories = (-55.0969 + (0.6309*hr) + (0.1988*weight/1000) +
+//                  (0.2017*age));
+//          calories = calories / 4.184;
+//      }
+//  } else { // here, calculation based on Estimated Energy Requirements
+//      calories = 0;
+//  }
+//
+//
+//System.println("HR " + HR + "*cals " + cals);
+
+  return EERcals;
+}
