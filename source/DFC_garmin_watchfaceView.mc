@@ -138,21 +138,21 @@ function onPhone(msg) {
       // Starting building the command response
       dataArray.add(HISTORIC_HR_COMMAND);
       while (HRSample != null) {
-		date = HRSample.when.value() + GARMIN_UTC_OFFSET;
-		if (date > startDate) {
-		  	var tempHR = HRSample.data;
-		  	if (tempHR == null) {
-		      HRSample = HRSensorHistoryIterator.next();
-		      continue;
-		    }
-		  dataArray.add(date);
-		  dataArray.add(HRSample.data);
-		  HRSample = HRSensorHistoryIterator.next();
-			} else {
-			  break;
-			}
-      	}
-  	  // Transmit command response
+	date = HRSample.when.value() + GARMIN_UTC_OFFSET;
+	if (date > startDate) {
+	  var tempHR = HRSample.data;
+	  if (tempHR == null) {
+	    HRSample = HRSensorHistoryIterator.next();
+	    continue;
+	  }
+	  dataArray.add(date);
+	  dataArray.add(HRSample.data);
+	  HRSample = HRSensorHistoryIterator.next();
+	} else {
+	  break;
+	}
+      }
+      // Transmit command response
       sendCommBusy = true;
       Comm.transmit(dataArray, null, commListener);
       
@@ -545,3 +545,171 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
   function onNextPage() {
   }
 }
+
+/* ****************************************************************************
+ * ****************************************************************************
+ * ****************************************************************************
+ *
+ * Storage
+ *
+ */
+
+const CALS_ARRAY_SIZE = 4 * 1000; // (8 kbytes - 192 bytes) size || ONLY 4000 bytes...
+const CALS_ARRAY_DATA_SIZE = 4; // each int stored equals to 4 bytes
+const PROPERTY_CALS_ARRAY_KEY = 1;
+const PROPERTY_CALS_ARRAY_START_POS_KEY = 2;
+const PROPERTY_CALS_ARRAY_START_TIME_KEY = 3;
+const PROPERTY_CALS_ARRAY_END_POS_KEY = 4;
+const PROPERTY_CALS_ARRAY_END_TIME_KEY = 5;
+
+var calsArray = null;
+var calsArrayStartPos = 0;
+var calsArrayStartTime = 0;
+var calsArrayEndPos = 0;
+var calsArrayEndTime = 0;
+
+function initStorage () {
+  var array = new [20];
+
+  array[0] = 100;
+  array[1] = 101;
+  array[2] = 102;
+  array[3] = 0.1;
+  array[4] = 0.2;
+  array[5] = "abc";
+
+  System.println("array " + array);
+
+//  var calsPerMinute = 0;
+//
+//  // Initialize var from the values on store object
+//  var app = App.getApp();
+//
+//  calsArray = app.getProperty(PROPERTY_CALS_ARRAY_KEY);
+//
+//app.clearProperties();
+//calsArray = null;
+//  if (calsArray == null) { // should happen only on the very first time the app runs
+//    calsArray = new [CALS_ARRAY_SIZE];
+//
+//    /* ************************************************
+//     * Fill the array with default value of calories
+//     */
+//    calsPerMinute = 1;// getCalsPerMinute (0); // default HR of 0
+//
+//    // start at current time and go backwards
+//    calsArrayEndPos = CALS_ARRAY_SIZE - 1;
+//    calsArrayEndTime = Time.now().value() / 60;
+//
+//    var i = CALS_ARRAY_SIZE;
+//    do {
+//      i -= CALS_ARRAY_DATA_SIZE;
+//      calsArray[i] = calsPerMinute;
+//    } while (i != 0);
+//
+//    calsArrayStartPos = 0;
+//    calsArrayStartTime = calsArrayEndTime - CALS_ARRAY_SIZE;
+//
+//    return; // array and all variables should be correct initialized
+//  }
+//
+//  calsArrayStartPos = app.getProperty(PROPERTY_CALS_ARRAY_START_POS_KEY);
+//  calsArrayStartTime = app.getProperty(PROPERTY_CALS_ARRAY_START_TIME_KEY);
+//  calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
+//  calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
+//
+//  var nowMinutes = Time.now().value() / 60;
+//System.println("nowMinutes " + nowMinutes);
+//  var minutesLeftInArray = nowMinutes - calsArrayEndTime;
+//System.println("minutesLeftInArray " + minutesLeftInArray);
+//  if (minutesLeftInArray > 0) { // need to update the array
+//    if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
+//
+//    // **********************************************************
+//    // Prepare HR Sensor history
+//    var targetMinute = nowMinutes - minutesLeftInArray;
+//System.println("targetMinute " + targetMinute);
+//    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
+//   	  {
+//   	  //Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
+//   	      //:period => new Toybox.Time.Duration.initiavar lize(5*60)
+//   	      :order => SensorHistory.ORDER_OLDEST_FIRST
+//   	  });
+//
+//
+//    // loop until get a value starting at date we are looking for
+//    var HRSample = HRSensorHistoryIterator.next();
+//    var maxSamples = 148; // vivoactive HR max samples = 148
+//    var date = 0;
+//    while (maxSamples > 0) {
+//      maxSamples--;
+//
+//      if (HRSample != null) {
+//	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+//	if (date > targetMinute) {
+//System.println("SensorHistory date " + date);
+//	  break; // leave this while loop cycle
+//	}
+//      }
+//
+//      HRSample = HRSensorHistoryIterator.next();
+//    }
+//    // **********************************************************
+//
+//    var HR = 0;
+//    while (minutesLeftInArray > 0) {
+//      minutesLeftInArray--;
+//
+//      // Manage the array pointer bondaries
+//      if (calsArrayEndPos >= (CALS_ARRAY_SIZE - CALS_ARRAY_DATA_SIZE)) {
+//	calsArrayEndPos = 0;
+//      } else {
+//	calsArrayEndPos += CALS_ARRAY_DATA_SIZE;
+//      }
+//
+//      if (calsArrayStartPos >= (CALS_ARRAY_SIZE - CALS_ARRAY_DATA_SIZE)) {
+//	calsArrayStartPos = 0;
+//      } else {
+//	calsArrayStartPos += CALS_ARRAY_DATA_SIZE;
+//      }
+//
+//      // **********************************************************
+//      // get the new values of calories and put on the array
+//      if (HRSample != null) {
+//     	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+//     	if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
+//	  HR = HRSample.data;
+//System.println("HR " + HR);
+//     	}
+//      } else {
+//	HR = 0;
+//      }
+//      HRSample = HRSensorHistoryIterator.next();
+//      targetMinute++;
+//      calsPerMinute += 1; // getCalsPerMinute (HR);
+//System.println("calsPerMinute " + calsPerMinute);
+//      // **********************************************************
+//
+//      calsArray[calsArrayEndPos] = calsPerMinute;
+//      calsArrayEndTime++;
+//      calsArrayStartTime++;
+//    }
+//
+//System.println("calsArray " + calsArray);
+//
+//    return; // array and all variables should be correct initialized
+//  }
+}
+
+function saveStorage () {
+   // Save now the values on store object
+  var app = App.getApp();
+//System.println("array size " + calsArray.size());
+//System.println("calsArray " + calsArray);
+  app.setProperty(PROPERTY_CALS_ARRAY_KEY, calsArray);
+  app.setProperty(PROPERTY_CALS_ARRAY_START_POS_KEY, calsArrayStartPos);
+  app.setProperty(PROPERTY_CALS_ARRAY_START_TIME_KEY, calsArrayStartTime);
+  app.setProperty(PROPERTY_CALS_ARRAY_END_POS_KEY, calsArrayEndPos);
+  app.setProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY, calsArrayEndTime);
+}
+
