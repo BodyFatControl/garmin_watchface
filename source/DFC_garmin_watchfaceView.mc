@@ -65,9 +65,7 @@ const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Ti
 const CUSTOM_FONT = false; // true to use the customFont but code needs to be built on Windows only :-(
 
 function CalcHRZones() {
-  var currentYear = (Time.now().value() / Time.Gregorian.SECONDS_PER_YEAR) + 1970;
-  var userProfile = UserProfile.getProfile();
-  zone_HR_max = 220 - (currentYear - userProfile.birthYear); // HRMax = 220 - UserAge
+  zone_HR_max = 220 - UserAge; // HRMax = 220 - UserAge
   zone_HR_min = zone_HR_max / 2;
 
   zone_HR_m_calc = (148.0 - INDICATOR_WIDTH) / (zone_HR_max - zone_HR_min); // screenWidth = 148 on VivoActive HR
@@ -158,7 +156,6 @@ function onPhone(msg) {
       
     } else if (msg.data[0] == USER_DATA_COMMAND) {
       // Get the parameters from the command
-      var userProfile = UserProfile.getProfile();
       // Starting building the command response
       dataArray.add(USER_DATA_COMMAND);
       dataArray.add(userProfile.birthYear);
@@ -203,6 +200,12 @@ class DFC_garmin_watchappView extends Ui.View {
     } else {
       customFont = Graphics.FONT_LARGE;
     }
+
+System.println("HR0 " + getCalsPerMinute (0));
+System.println("HR89 " + getCalsPerMinute (89));
+System.println("HR90 " + getCalsPerMinute (90));
+System.println("HR110 " + getCalsPerMinute (110));
+System.println("HR150 " + getCalsPerMinute (150));
 
     timer1.start(method(:timer1Callback), 60*1000, true);
   }
@@ -720,55 +723,48 @@ function saveStorage () {
   T = Exercise duration time (in hours)
 */
 
+var userProfile = UserProfile.getProfile();
 var UserAge = 0;
 var UserWeight = 0;
 var UserHeight = 0;
-var EERcals = 0;
+var EERCalsPerMinute = 0;
 
 function initEERCals () {
   var currentYear = (Time.now().value() / Time.Gregorian.SECONDS_PER_YEAR) + 1970;
-  var userProfile = UserProfile.getProfile();
-  var UserAge = currentYear - userProfile.birthYear; // years
-  var UserWeight = userProfile.weight / 1000.0; // kg
-  var UserHeight = userProfile.height / 100.0; // meters
+  UserAge = currentYear - userProfile.birthYear; // years
+  UserWeight = userProfile.weight / 1000.0; // kg
+  UserHeight = userProfile.height / 100.0; // meters
 
   //EER
   if (userProfile.gender == UserProfile.GENDER_FEMALE) { // female
-    EERcals = ((387 - (7.31*UserAge) + (1.0*(10.9*UserWeight)) + (660.7*UserHeight))); // daily value
+    EERCalsPerMinute = ((387 - (7.31*UserAge) + (1.0*(10.9*UserWeight)) + (660.7*UserHeight))); // daily value
   } else { // male
-    EERcals = ((864 - (9.72*UserAge) + (1.0*(14.2*UserWeight)) + (503*UserHeight)));
+    EERCalsPerMinute = ((864 - (9.72*UserAge) + (1.0*(14.2*UserWeight)) + (503*UserHeight)));
   }
 
-  EERcals /= 24.0 * 60.0; // per minute value of the day
-  EERcals *= 1000;
-  EERcals = EERcals.toNumber(); // int value and 1000x the real value
-
-System.println("EERcals " + EERcals);
+  EERCalsPerMinute /= 24.0 * 60.0; // per minute value of the day
+  EERCalsPerMinute *= 1000;
+  EERCalsPerMinute = EERCalsPerMinute.toNumber(); // int value and 1000x the real value
 }
 
 function getCalsPerMinute (HR) {
-//
-//
-//  //With HR >= 90
-//  double hr = (double) hr_value;
-//  double calories;
-//  if (hr >= 90 && hr < 255) { // calculation based on formula without VO2max
-//      if (gender == 0) { // female
-//          calories = (-20.4022 + (0.4472*hr) - (0.1263*weight/1000) +
-//                  (0.074*age));
-//          calories = calories / 4.184;
-//
-//      } else { // male
-//          calories = (-55.0969 + (0.6309*hr) + (0.1988*weight/1000) +
-//                  (0.2017*age));
-//          calories = calories / 4.184;
-//      }
-//  } else { // here, calculation based on Estimated Energy Requirements
-//      calories = 0;
-//  }
-//
-//
-//System.println("HR " + HR + "*cals " + cals);
+  var calories;
+  if (HR >= 90 && HR < 255) { // HR >= 90 only, calculation based on formula without VO2max
+      if (userProfile.gender == UserProfile.GENDER_FEMALE) { // female
+          calories = (-20.4022 + (0.4472*HR) - (0.1263*UserWeight) + (0.074*UserAge));
+          calories = calories / 4.184;
+          calories *= 1000;
+          calories = calories.toNumber(); // int value and 1000x the real value
 
-  return EERcals;
+      } else { // male
+          calories = (-55.0969 + (0.6309*HR) + (0.1988*UserWeight) + (0.2017*UserAge));
+          calories = calories / 4.184;
+          calories *= 1000;
+          calories = calories.toNumber(); // int value and 1000x the real value
+      }
+  } else { // here, calculation based on Estimated Energy Requirements
+      calories = EERCalsPerMinute;
+  }
+
+  return calories;
 }
