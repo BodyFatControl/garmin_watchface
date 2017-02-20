@@ -18,7 +18,7 @@ var HRSensorEnable = false;
 var sport_mode = false;
 const SPORT_MODE_MIN_TIME = 60; // in seconds
 var onSensorHRCounter = SPORT_MODE_MIN_TIME;
-var last_minute = -1;
+var last_minute = -99;
 const DISPLAY_HEIGHT_OFFSET = 57;
 var screenWidth;
 var screenHeight;
@@ -32,7 +32,7 @@ const INDICATOR_WIDTH_HALF = 7;
 const INDICATOR_HEIGHT = 12;
 var customFont = null;
 
-var secondsCounter = 0;
+var minutesCounter = 0;
 
 const COLOR_GRAY_1 = 0xAAAAAA;
 const COLOR_GRAY_2 = 0x555555;
@@ -397,6 +397,8 @@ class DFC_garmin_watchappView extends Ui.View {
       }
 
     } else if (clockTime.min != last_minute) {
+      last_minute = clockTime.min;
+
       /********************************************/
       // Draw calories zones graphs
       //
@@ -459,12 +461,14 @@ class DFC_garmin_watchappView extends Ui.View {
 	}
       }
     
-      secondsCounter++;
-      if (secondsCounter >= 2) {
-	secondsCounter = 0;
+      minutesCounter++;
+      if (minutesCounter >= 2) {
+	minutesCounter = 0;
 	sendAliveCommand();
       }
     }
+
+    updateCallsArray(clockTime.min);
   }
 }
 
@@ -551,7 +555,7 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
  *
  */
 
-const CALS_ARRAY_SIZE = 1550; // each element is 4 bytes: 1550*4 = ~6kbytes <-- higher value will not work
+const CALS_ARRAY_SIZE = 1000;//1550; // each element is 4 bytes: 1550*4 = ~6kbytes <-- higher value will not work
 const PROPERTY_CALS_ARRAY_KEY = 1;
 const PROPERTY_CALS_ARRAY_END_POS_KEY = 2;
 const PROPERTY_CALS_ARRAY_END_TIME_KEY = 3;
@@ -568,30 +572,20 @@ function initStorage () {
   calsArray = app.getProperty(PROPERTY_CALS_ARRAY_KEY);
 //app.clearProperties();
 //calsArray = null;
+  var nowMinutes = Time.now().value() / 60;
+  var minutesLeftInArray = 0;
   if (calsArray == null) { // should happen only on the very first time the app runs
     calsArray = new [CALS_ARRAY_SIZE];
-
-    /* ************************************************
-     * Fill the array with default value of calories
-     */
-    calsPerMinute = getCalsPerMinute (0); // default HR of 0
-
-    // start at current time and go backwards
     calsArrayEndPos = CALS_ARRAY_SIZE - 1;
-    calsArrayEndTime = Time.now().value() / 60;
+    calsArrayEndTime = nowMinutes - CALS_ARRAY_SIZE;
+    minutesLeftInArray = CALS_ARRAY_SIZE;
 
-    for (var i = 0; i < CALS_ARRAY_SIZE; i++) {
-      calsArray[i] = calsPerMinute;
-    }
-
-    return; // array and all variables should be correct initialized
+  } else {
+    minutesLeftInArray = nowMinutes - calsArrayEndTime;
+    calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
+    calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
   }
 
-  calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
-  calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
-
-  var nowMinutes = Time.now().value() / 60;
-  var minutesLeftInArray = nowMinutes - calsArrayEndTime;
   if (minutesLeftInArray) { // need to update the array
     if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
 
@@ -615,6 +609,7 @@ function initStorage () {
       } else { // no more samples
 	brake;
       }
+
     } while (date < targetMinute);
     // **********************************************************
 
@@ -630,18 +625,20 @@ function initStorage () {
       // get the new values of calories and put on the array
       if (HRSample != null) {
 	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+
 	if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
 	  if (HRSample.data != null) {
 	    HR = HRSample.data;
+	    HRSample = HRSensorHistoryIterator.next();
+	  } else {
+	    HR = 0;
 	  }
 	}
-
-	HRSample = HRSensorHistoryIterator.next();
       } else { // no more data from SensorHistory
 	HR = 0;
       }
 
-      calsArray[calsArrayEndPos] = getCalsPerMinute (HR);
+      calsArray[calsArrayEndPos] = HR; //getCalsPerMinute (HR);
       calsArrayEndTime++;
 
       targetMinute++;
@@ -739,3 +736,70 @@ function getCalsPerMinute (HR) {
 
   return calories;
 }
+
+
+// *****************************
+var HR = 0;
+var updateCallsArray_lastMinute = -99;
+
+function updateCallsArray (currentTimeMinute) {
+  if (currentTimeMinute != updateCallsArray_lastMinute) { // do only when 1 minute has passed
+    updateCallsArray_lastMinute = currentTimeMinute;
+
+    var nowMinutes = Time.now().value() / 60;
+    var date = 0;
+
+    // **********************************************************
+    // Prepare HR Sensor history
+    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
+	{
+	//Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
+	    //:period => new Toybox.Time.Duration.initiavar lize(5*60)
+	    :order => SensorHistory.ORDER_NEWEST_FIRST
+	});
+
+    var HRSample = HRSensorHistoryIterator.next();
+    if (HRSample != null) {
+      date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+
+      if ((date < nowMinutes) && (date >= (nowMinutes-1))) { // get HR values that are only on the last minute
+	if (HRSample.data != null) {
+	  HR = HRSample.data;
+	}
+      }
+    } else { // no more data from SensorHistory
+      HR = 0;
+    }
+
+System.println("nowMinutes " + nowMinutes + "HR " + HR);
+
+    // Manage the array pointer bondaries
+    if (calsArrayEndPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayEndPos = 0; }
+    else { calsArrayEndPos++; }
+
+    calsArray[calsArrayEndPos] = HR; //getCalsPerMinute (HR);
+    calsArrayEndTime++;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
