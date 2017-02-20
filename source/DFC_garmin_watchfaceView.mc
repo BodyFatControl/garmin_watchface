@@ -56,6 +56,7 @@ const CALORIES_BALANCE_COMMAND = 304030201;
 
 var caloriesBalance = 0;
 var caloriesBalanceScale = 1;
+var todayCalories = 0;
 
 // Seems a Garmin bug, because UTC time is UTC 00:00 Dec 31 1989
 //Unix UTC time: 1 January 1970
@@ -446,12 +447,13 @@ class DFC_garmin_watchappView extends Ui.View {
       /********************************************/
 
       // Display the calories balance value
-      if (caloriesBalance != 0) {
+//      if (caloriesBalance != 0) {
+      if (todayCalories != 0) {
 	if (caloriesBalance < 0) { dc.setColor(0xFF0055, Gfx.COLOR_TRANSPARENT); }
 	if (CUSTOM_FONT == true) {
-	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET)), customFont, caloriesBalance, Gfx.TEXT_JUSTIFY_CENTER);
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET)), customFont, todayCalories/1000, Gfx.TEXT_JUSTIFY_CENTER);
 	} else {
-	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 8)), customFont, caloriesBalance, Gfx.TEXT_JUSTIFY_CENTER);
+	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 8)), customFont, todayCalories/1000, Gfx.TEXT_JUSTIFY_CENTER);
 	}
       } else {
 	if (CUSTOM_FONT == true) {
@@ -555,7 +557,7 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
  *
  */
 
-const CALS_ARRAY_SIZE = 1000;//1550; // each element is 4 bytes: 1550*4 = ~6kbytes <-- higher value will not work
+const CALS_ARRAY_SIZE = 1440;//1550; // each element is 4 bytes: 1550*4 = ~6kbytes <-- higher value will not work
 const PROPERTY_CALS_ARRAY_KEY = 1;
 const PROPERTY_CALS_ARRAY_END_POS_KEY = 2;
 const PROPERTY_CALS_ARRAY_END_TIME_KEY = 3;
@@ -566,85 +568,97 @@ var calsArrayEndTime = 0;
 
 function initStorage () {
   var calsPerMinute = 0;
+  var nowMinutes = Time.now().value() / 60;
+  var minutesLeftInArray = 0;
 
   // Initialize var from the values on store object
   var app = App.getApp();
   calsArray = app.getProperty(PROPERTY_CALS_ARRAY_KEY);
 //app.clearProperties();
 //calsArray = null;
-  var nowMinutes = Time.now().value() / 60;
-  var minutesLeftInArray = 0;
   if (calsArray == null) { // should happen only on the very first time the app runs
     calsArray = new [CALS_ARRAY_SIZE];
     calsArrayEndPos = CALS_ARRAY_SIZE - 1;
-    calsArrayEndTime = nowMinutes - CALS_ARRAY_SIZE;
-    minutesLeftInArray = CALS_ARRAY_SIZE;
+    calsArrayEndTime = nowMinutes;
+    minutesLeftInArray = 0;
 
   } else {
-    minutesLeftInArray = nowMinutes - calsArrayEndTime;
     calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
     calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
-  }
+    minutesLeftInArray = nowMinutes - calsArrayEndTime;
 
-  if (minutesLeftInArray) { // need to update the array
-    if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
-
-    // **********************************************************
-    // Prepare HR Sensor history
-    var targetMinute = nowMinutes - minutesLeftInArray;
-    var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
-   	  {
-   	  //Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
-   	      //:period => new Toybox.Time.Duration.initiavar lize(5*60)
-   	      :order => SensorHistory.ORDER_OLDEST_FIRST
-   	  });
-
-    // move forward SensorHistoryIterator until the date we are looking for
-    var HRSample = 0;
-    var date = 0;
-    do {
-      HRSample = HRSensorHistoryIterator.next();
-      if (HRSample != null) {
-	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
-      } else { // no more samples
-	brake;
-      }
-
-    } while (date < targetMinute);
-    // **********************************************************
-
-    var HR = 0;
-    while (minutesLeftInArray) {
-      minutesLeftInArray--;
-
-      // Manage the array pointer bondaries
-      if (calsArrayEndPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayEndPos = 0; }
-      else { calsArrayEndPos++; }
+    if (minutesLeftInArray) { // need to update the array
+      if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
 
       // **********************************************************
-      // get the new values of calories and put on the array
-      if (HRSample != null) {
-	date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+      // Prepare HR Sensor history
+      var targetMinute = nowMinutes - minutesLeftInArray;
+      var HRSensorHistoryIterator = SensorHistory.getHeartRateHistory(
+	    {
+	    //Garmin Connect IQ bug?? https://forums.garmin.com/showthread.php?354356-Toybox-SensorHistory-question&highlight=sensorhistory+period
+		//:period => new Toybox.Time.Duration.initiavar lize(5*60)
+		:order => SensorHistory.ORDER_OLDEST_FIRST
+	    });
 
-	if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
-	  if (HRSample.data != null) {
-	    HR = HRSample.data;
-	    HRSample = HRSensorHistoryIterator.next();
-	  } else {
-	    HR = 0;
-	  }
+      // move forward SensorHistoryIterator until the date we are looking for
+      var HRSample = 0;
+      var date = 0;
+      do {
+	HRSample = HRSensorHistoryIterator.next();
+	if (HRSample != null) {
+	  date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+	} else { // no more samples
+	  break;
 	}
-      } else { // no more data from SensorHistory
-	HR = 0;
+      } while (date < targetMinute);
+      // **********************************************************
+
+      var HR = 0;
+      while (minutesLeftInArray) {
+	minutesLeftInArray--;
+
+	// **********************************************************
+	// get the new values of calories and put on the array
+	if (HRSample != null) {
+	  if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
+	    if (HRSample.data != null) {
+	      HR = HRSample.data;
+	      HRSample = HRSensorHistoryIterator.next();
+	      date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+	    } else {
+	      HR = -2;
+	    }
+	  }
+	} else { // no more data from SensorHistory
+	  HR = -1;
+	}
+
+	// Manage the array pointer bondaries
+	if (calsArrayEndPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayEndPos = 0; }
+	else { calsArrayEndPos++; }
+
+	calsArray[calsArrayEndPos] = getCalsPerMinute (HR);
+	calsArrayEndTime++;
+
+	targetMinute++;
       }
-
-      calsArray[calsArrayEndPos] = HR; //getCalsPerMinute (HR);
-      calsArrayEndTime++;
-
-      targetMinute++;
     }
 
-    return; // array and all variables should be correct initialized
+    // ****************************************************************************
+    // Now calc the calories of today up to current date
+    var startTodayMinutes = Time.today().value() / 60;
+    var enPosMinutes = nowMinutes - startTodayMinutes;
+
+    var index = calsArrayEndPos;
+    while (enPosMinutes) { // loop over all the values of calsArray between midnight and now
+      enPosMinutes--;
+
+      if (calsArray[index] != null) {
+	todayCalories += calsArray[index];
+      }
+      if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
+      else { index--; }
+    }
   }
 }
 
@@ -771,13 +785,13 @@ function updateCallsArray (currentTimeMinute) {
       HR = 0;
     }
 
-System.println("nowMinutes " + nowMinutes + "HR " + HR);
-
     // Manage the array pointer bondaries
     if (calsArrayEndPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayEndPos = 0; }
     else { calsArrayEndPos++; }
 
-    calsArray[calsArrayEndPos] = HR; //getCalsPerMinute (HR);
+    calsArray[calsArrayEndPos] = getCalsPerMinute (HR);
+    todayCalories += calsArray[calsArrayEndPos];
+System.println("nowMinutes " + nowMinutes + "cals " + calsArray[calsArrayEndPos]);
     calsArrayEndTime++;
   }
 }
