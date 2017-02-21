@@ -58,6 +58,8 @@ var caloriesBalance = 0;
 var caloriesBalanceScale = 1;
 var todayCalories = 0;
 
+var onlyOnce = 0;
+
 // Seems a Garmin bug, because UTC time is UTC 00:00 Dec 31 1989
 //Unix UTC time: 1 January 1970
 //Garmin UTC time: 31 December 1989
@@ -290,6 +292,13 @@ class DFC_garmin_watchappView extends Ui.View {
     var minuteHandAngle;
     var secondHandAngle;
 
+    if (onlyOnce == 0) {
+	onlyOnce = 1;
+
+	initStorage();
+	caloriesBalanceScale = (EERCalsPerMinute * 60 * 24) * 0.4;
+    }
+
     width = dc.getWidth();
     height = dc.getHeight() - DISPLAY_HEIGHT_OFFSET;
 
@@ -429,7 +438,8 @@ class DFC_garmin_watchappView extends Ui.View {
       // calc position of the indicator
       var bar_with = 148.0 - INDICATOR_WIDTH;
       var scale = bar_with / caloriesBalanceScale;
-      var caloriesIndicator = caloriesBalance * scale;
+//      var caloriesIndicator = caloriesBalance * scale;
+      var caloriesIndicator = todayCalories * scale;
       caloriesIndicator = caloriesIndicator.toNumber();
 
       dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
@@ -586,6 +596,11 @@ function initStorage () {
     calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
     calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
     minutesLeftInArray = nowMinutes - calsArrayEndTime;
+//    minutesLeftInArray++; // -1???
+
+//System.println("nowMinutes " + nowMinutes);
+//System.println("calsArrayEndTime " + calsArrayEndTime);
+//System.println("minutesLeftInArray " + minutesLeftInArray);
 
     if (minutesLeftInArray) { // need to update the array
       if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
@@ -643,6 +658,8 @@ function initStorage () {
 	targetMinute++;
       }
     }
+
+    calsArrayEndTime--;
 
     // ****************************************************************************
     // Now calc the calories of today up to current date
@@ -761,6 +778,12 @@ function updateCallsArray (currentTimeMinute) {
     updateCallsArray_lastMinute = currentTimeMinute;
 
     var nowMinutes = Time.now().value() / 60;
+    var startTodayMinutes = Time.today().value() / 60;
+
+    if (nowMinutes == startTodayMinutes) { // means it is the first minute of the day
+      todayCalories = 0; // reset the calories value at midnight
+    }
+
     var date = 0;
 
     // **********************************************************
@@ -791,7 +814,7 @@ function updateCallsArray (currentTimeMinute) {
 
     calsArray[calsArrayEndPos] = getCalsPerMinute (HR);
     todayCalories += calsArray[calsArrayEndPos];
-System.println("nowMinutes " + nowMinutes + "cals " + calsArray[calsArrayEndPos]);
+//System.println("nowMinutes " + nowMinutes + "cals " + calsArray[calsArrayEndPos]);
     calsArrayEndTime++;
   }
 }
