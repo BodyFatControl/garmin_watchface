@@ -137,12 +137,31 @@ function onPhone(msg) {
 
     // Execute the command
     if (msg.data[0] == HISTORIC_HR_COMMAND) {
-      var startDate = msg.data[1]; // date in minutes
       dataArray.add(HISTORIC_HR_COMMAND);
-
-      var date = Time.now().value() / 60;
+      var date = Time.now().value() / 60; // date from seconds to minutes
+      var startDate = msg.data[1]; // date comes already in minutes
+      if (startDate < (date - CALS_ARRAY_SIZE)) { startDate = date - CALS_ARRAY_SIZE; }
+      var count = date - startDate;
       var index = calsArrayEndPos;
-      while (date >= startDate) {
+      if (count > CALS_ARRAY_SIZE) {count = CALS_ARRAY_SIZE;}
+      // a value of much higher than 720 of dataArray will give "out of memory error"
+      if (count > 720) {
+	  var temp = count - 720;
+	  count = 720;
+	  // go back a value of 720
+	  date -= temp;
+	  var temp1 = temp;
+	  while (temp1) { // decrementing index up to value temp
+	    temp1--;
+	    if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
+	    else { index--; }
+	  }
+      }
+      if (count < 0) { count = 0;}
+
+      // now prepare the array with the data
+      while (count) {
+	count--;
 	dataArray.add(date);
 	date--; // update next date for the next minute
 	dataArray.add(calsArray[index]);
