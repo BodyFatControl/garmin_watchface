@@ -49,7 +49,7 @@ const COLOR_YELLOW_2 = 0xFFFF00;
 
 var clockTime = Sys.getClockTime();
 
-const HISTORIC_HR_COMMAND = 104030201;
+const HISTORIC_CALS_COMMAND = 104030201;
 const ALIVE_COMMAND = 154030201;
 const USER_DATA_COMMAND = 204030201;
 const CALORIES_CONSUMED_COMMAND = 304030201;
@@ -136,34 +136,20 @@ function onPhone(msg) {
     var dataArray = [];
 
     // Execute the command
-    if (msg.data[0] == HISTORIC_HR_COMMAND) {
-      dataArray.add(HISTORIC_HR_COMMAND);
+    if (msg.data[0] == HISTORIC_CALS_COMMAND) {
+      dataArray.add(HISTORIC_CALS_COMMAND);
       var date = Time.now().value() / 60; // date from seconds to minutes
+      dataArray.add(date);
       var startDate = msg.data[1]; // date comes already in minutes
       if (startDate < (date - CALS_ARRAY_SIZE)) { startDate = date - CALS_ARRAY_SIZE; }
       var count = date - startDate;
       var index = calsArrayEndPos;
       if (count > CALS_ARRAY_SIZE) {count = CALS_ARRAY_SIZE;}
-      // a value of much higher than 720 of dataArray will give "out of memory error"
-      if (count > 720) {
-	  var temp = count - 720;
-	  count = 720;
-	  // go back a value of 720
-	  date -= temp;
-	  var temp1 = temp;
-	  while (temp1) { // decrementing index up to value temp
-	    temp1--;
-	    if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
-	    else { index--; }
-	  }
-      }
       if (count < 0) { count = 0;}
 
       // now prepare the array with the data
       while (count) {
 	count--;
-	dataArray.add(date);
-	date--; // update next date for the next minute
 	dataArray.add(calsArray[index]);
         if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
         else { index--; }
@@ -182,6 +168,7 @@ function onPhone(msg) {
       dataArray.add(userProfile.height);
       dataArray.add(userProfile.weight);
       dataArray.add(userProfile.activityClass);
+      dataArray.add(EERCalsPerMinute);
       // Transmit command response
       sendCommBusy = true;
       Comm.transmit(dataArray, null, commListener);
@@ -592,8 +579,8 @@ function initStorage () {
   // Initialize var from the values on store object
   var app = App.getApp();
   calsArray = app.getProperty(PROPERTY_CALS_ARRAY_KEY);
-//app.clearProperties();
-//calsArray = null;
+app.clearProperties();
+calsArray = null;
   if (calsArray == null) { // should happen only on the very first time the app runs
     calsArray = new [CALS_ARRAY_SIZE];
     calsArrayEndPos = CALS_ARRAY_SIZE - 1;
@@ -607,7 +594,7 @@ function initStorage () {
       if (calsArrayEndPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayEndPos = 0; }
       else { calsArrayEndPos++; }
 
-      calsArray[calsArrayEndPos] = 0; // populate with HR = 0
+      calsArray[calsArrayEndPos] = EERCalsPerMinute; // populate with EERCalsPerMinute
     }
 
     // ****************************************************************************
@@ -620,7 +607,7 @@ function initStorage () {
       enPosMinutes--;
 
       if (calsArray[index] != null) {
-	todayCalories += getCalsPerMinute (calsArray[index]);
+	todayCalories += calsArray[index];
       }
       if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
       else { index--; }
@@ -667,11 +654,11 @@ function initStorage () {
 	// **********************************************************
 	// get the new values of calories and put on the array
 	if (HRSample != null) {
+	  date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
 	  if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
 	    if (HRSample.data != null) {
 	      HR = HRSample.data;
 	      HRSample = HRSensorHistoryIterator.next();
-	      date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
 	    } else {
 	      HR = 0;
 	    }
@@ -684,7 +671,7 @@ function initStorage () {
 	if (calsArrayEndPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayEndPos = 0; }
 	else { calsArrayEndPos++; }
 
-	calsArray[calsArrayEndPos] = HR;
+	calsArray[calsArrayEndPos] = getCalsPerMinute(HR);
 	calsArrayEndTime++;
 
 	targetMinute++;
@@ -703,7 +690,7 @@ function initStorage () {
       enPosMinutes--;
 
       if (calsArray[index] != null) {
-	todayCalories += getCalsPerMinute (calsArray[index]);
+	todayCalories += calsArray[index];
       }
       if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
       else { index--; }
@@ -843,10 +830,10 @@ function updateCallsArray (currentTimeMinute) {
     if (calsArrayEndPos >= (CALS_ARRAY_SIZE - 1)) { calsArrayEndPos = 0; }
     else { calsArrayEndPos++; }
 
-    calsArray[calsArrayEndPos] = HR;
+    calsArray[calsArrayEndPos] = getCalsPerMinute (HR);
     calsArrayEndTime++;
 
-    todayCalories += getCalsPerMinute (HR);
+    todayCalories += calsArray[calsArrayEndPos];
   }
 }
 
