@@ -451,7 +451,7 @@ class DFC_garmin_watchappView extends Ui.View {
       var x1 = (bar_with/4) + caloriesIndicator;
       // impose limits
       if (x1 > bar_with) { x1 = bar_with; }
-      else if (x1 < INDICATOR_WIDTH) { x1 = INDICATOR_WIDTH; }
+      else if (x1 < 0) { x1 = 0; }
 
       var y1 = screenHeight - 12;
       var x2 = x1 + INDICATOR_WIDTH;
@@ -463,7 +463,7 @@ class DFC_garmin_watchappView extends Ui.View {
 
       // Display the calories balance value
       if (caloriesBalance != 0) {
-	if (caloriesBalance < 0) { dc.setColor(0xFF0055, Gfx.COLOR_TRANSPARENT); }
+	if (caloriesBalance < 0) { dc.setColor(0xFF55AA, Gfx.COLOR_TRANSPARENT); }
 	if (CUSTOM_FONT == true) {
 	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET)), customFont, caloriesBalance, Gfx.TEXT_JUSTIFY_CENTER);
 	} else {
