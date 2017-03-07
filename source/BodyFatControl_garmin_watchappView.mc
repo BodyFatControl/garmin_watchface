@@ -190,7 +190,7 @@ function sendAliveCommand () {
   }
 }
 
-class DFC_garmin_watchappView extends Ui.View {
+class BodyFatControl_garmin_watchappView extends Ui.View {
   function initialize() {
     View.initialize();
 
@@ -422,7 +422,7 @@ class DFC_garmin_watchappView extends Ui.View {
       var y = screenHeight - 10; // height of the bars
       var y_height = screenHeight;
       dc.fillRectangle(x, y, x_width, y_height);
-     
+
       dc.setColor(COLOR_GREEN_1, Gfx.COLOR_TRANSPARENT);
       x += x_width + 2;
       dc.fillRectangle(x, y, x_width, y_height);

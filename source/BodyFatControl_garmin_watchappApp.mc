@@ -1,6 +1,6 @@
 using Toybox.Application as App;
 
-class DFC extends App.AppBase {
+class BodyFatControl extends App.AppBase {
 
     function initialize() {
         AppBase.initialize();
@@ -19,6 +19,6 @@ class DFC extends App.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() {
-        return [ new DFC_garmin_watchappView(), new BaseInputDelegate()];
+        return [ new BodyFatControl_garmin_watchappView(), new BaseInputDelegate()];
     }
 }
