@@ -1,0 +1,16 @@
+Privacy Policy
+
+User data
+• the Body Fat Control collect the following user information: birth year, gender, weight, height and activity class
+• the user information is sent by the Body Fat Control Garmin app to the Android app and is stored on the SDCard folder "body_fat_control" on SQlitte database files and this information is used to calc the user spent calories
+• the information is retained as long as the user use the application
+• the user can at anytime delete the data, by deleting the "body_fat_control" folder
+• the user data is submitted only to the Application and not to Garmin, Garmin has no responsibility or liability for any such data
+• the application is OpenSource and means that anyone can inspect how the user data is managed
+    
+Location Data
+• the Body Fat Control do not collect location data about users
+
+Consent
+• by installing and using the Body Fat control application, the user is giving express consent for the previous refered user data to be used in the terms expressed and for the limited purposes refered
+• the Body Fat Control application may not sell, rent, or transfer (directly or indirectly) any user data concerning a user or the user’s activities received from Garmin
