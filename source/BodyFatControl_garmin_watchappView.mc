@@ -138,7 +138,9 @@ function onPhone(msg) {
     // Execute the command
     if (msg.data[0] == HISTORIC_CALS_COMMAND) {
       dataArray.add(HISTORIC_CALS_COMMAND);
-      var date = Time.now().value() / 60; // date from seconds to minutes
+      var date = (Time.now().value() + // current value in seconds
+	  Sys.getClockTime().timeZoneOffset) // add time zone offset from UTC time
+	  / 60; // convert the date from seconds to minutes
       dataArray.add(date);
       var startDate = msg.data[1]; // date comes already in minutes
       if (startDate < (date - CALS_ARRAY_SIZE)) { startDate = date - CALS_ARRAY_SIZE; }
@@ -702,9 +704,10 @@ function saveStorage () {
    // Save now the values on store object
   var app = App.getApp();
 //System.println("calsArray " + calsArray);
-  app.setProperty(PROPERTY_CALS_ARRAY_KEY, calsArray);
   app.setProperty(PROPERTY_CALS_ARRAY_END_POS_KEY, calsArrayEndPos);
   app.setProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY, calsArrayEndTime);
+  app.setProperty(PROPERTY_CALS_ARRAY_KEY, calsArray);
+  app.saveProperties();
 }
 
 /* ****************************************************************************
