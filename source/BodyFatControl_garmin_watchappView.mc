@@ -77,6 +77,9 @@ var onlyOnce = 0;
 //Garmin UTC time: 31 December 1989
 const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Time.Gregorian.SECONDS_PER_DAY;
 
+const TIME_ZONE_OFFSET = Sys.getClockTime().timeZoneOffset;
+const START_TODAY_MINUTES = (Time.today().value() + TIME_ZONE_OFFSET) / 60; // UTC time
+
 const CUSTOM_FONT = false; // true to use the customFont but code needs to be built on Windows only :-(
 
 function CalcHRZones() {
@@ -139,7 +142,7 @@ function onPhone(msg) {
     if (msg.data[0] == HISTORIC_CALS_COMMAND) {
       dataArray.add(HISTORIC_CALS_COMMAND);
       var date = (Time.now().value() + // current value in seconds
-	  Sys.getClockTime().timeZoneOffset) // add time zone offset from UTC time
+	  TIME_ZONE_OFFSET) // add time zone offset from UTC time
 	  / 60; // convert the date from seconds to minutes
       dataArray.add(date);
       var startDate = msg.data[1]; // date comes already in minutes
@@ -297,11 +300,29 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
     var secondHandAngle;
 
     if (onlyOnce == 0) {
-	onlyOnce = 1;
+      onlyOnce = 1;
+//	initStorage();
 
-	initStorage();
-	caloriesBalanceScale = ((EERCalsPerMinute/1000) * 60 * 24) * 0.4;
-	caloriesBalanceScale = caloriesBalanceScale.toNumber();
+      // ****************************************************************************
+      // THIS piece of code would run at the end of initStorage(); but watchdog kicks in so run after here to avoid watchdog
+      // Now calc the calories of today up to current date
+      var nowMinutes1 = (Time.now().value() + TIME_ZONE_OFFSET) / 60; // UTC time
+      var enPosMinutes = nowMinutes1 - START_TODAY_MINUTES;
+      System.println("enPosMinutes " + enPosMinutes);
+      var index = calsArrayEndPos;
+      while (enPosMinutes != 0) { // loop over all the values of calsArray between midnight and now
+	enPosMinutes--;
+
+	if (calsArray[index] != null) {
+	  todayCalories += calsArray[index];
+	}
+	if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
+	else { index--; }
+      }
+      // ****************************************************************************
+
+      caloriesBalanceScale = ((EERCalsPerMinute/1000) * 60 * 24) * 0.4;
+      caloriesBalanceScale = caloriesBalanceScale.toNumber();
     }
 
     width = dc.getWidth();
@@ -575,14 +596,14 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
 
 function initStorage () {
   var calsPerMinute = 0;
-  var nowMinutes = Time.now().value() / 60;
+  var nowMinutes = (Time.now().value() + TIME_ZONE_OFFSET) / 60;
   var minutesLeftInArray = 0;
 
   // Initialize var from the values on store object
   var app = App.getApp();
   calsArray = app.getProperty(PROPERTY_CALS_ARRAY_KEY);
-app.clearProperties();
-calsArray = null;
+//app.clearProperties();
+//calsArray = null;
   if (calsArray == null) { // should happen only on the very first time the app runs
     calsArray = new [CALS_ARRAY_SIZE];
     calsArrayEndPos = CALS_ARRAY_SIZE - 1;
@@ -601,8 +622,8 @@ calsArray = null;
 
     // ****************************************************************************
     // Now calc the calories of today up to current date
-    var startTodayMinutes = Time.today().value() / 60;
-    var enPosMinutes = nowMinutes - startTodayMinutes;
+    var START_TODAY_MINUTES = (Time.today().value() + TIME_ZONE_OFFSET) / 60;
+    var enPosMinutes = nowMinutes - START_TODAY_MINUTES;
 
     var index = calsArrayEndPos;
     while (enPosMinutes) { // loop over all the values of calsArray between midnight and now
@@ -617,13 +638,10 @@ calsArray = null;
   } else {
     calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
     calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
-    minutesLeftInArray = nowMinutes - calsArrayEndTime;
-//    minutesLeftInArray++; // -1???
-//System.println("nowMinutes " + nowMinutes);
-//System.println("calsArrayEndPos " + calsArrayEndPos);
-//System.println("calsArrayEndTime " + calsArrayEndTime);
-//System.println("minutesLeftInArray " + minutesLeftInArray);
-    if (minutesLeftInArray) { // need to update the array
+//    minutesLeftInArray = nowMinutes - calsArrayEndTime;
+    minutesLeftInArray = (nowMinutes - calsArrayEndTime) - 1; // -1 to try avoid a bug where about 2 cals are always added at start of the app, when HR > 90
+
+    if (minutesLeftInArray > 0) { // need to update the array
       if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
 
       // **********************************************************
@@ -642,7 +660,7 @@ calsArray = null;
       do {
 	HRSample = HRSensorHistoryIterator.next();
 	if (HRSample != null) {
-	  date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+	  date = (HRSample.when.value() + GARMIN_UTC_OFFSET + TIME_ZONE_OFFSET) / 60;
 	} else { // no more samples
 	  break;
 	}
@@ -656,7 +674,7 @@ calsArray = null;
 	// **********************************************************
 	// get the new values of calories and put on the array
 	if (HRSample != null) {
-	  date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+	  date = (HRSample.when.value() + GARMIN_UTC_OFFSET + TIME_ZONE_OFFSET) / 60;
 	  if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
 	    if (HRSample.data != null) {
 	      HR = HRSample.data;
@@ -681,33 +699,15 @@ calsArray = null;
     }
 
     calsArrayEndTime--;
-
-    // ****************************************************************************
-    // Now calc the calories of today up to current date
-    var startTodayMinutes = Time.today().value() / 60;
-    var enPosMinutes = nowMinutes - startTodayMinutes;
-
-    var index = calsArrayEndPos;
-    while (enPosMinutes) { // loop over all the values of calsArray between midnight and now
-      enPosMinutes--;
-
-      if (calsArray[index] != null) {
-	todayCalories += calsArray[index];
-      }
-      if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
-      else { index--; }
-    }
   }
 }
 
 function saveStorage () {
    // Save now the values on store object
   var app = App.getApp();
-//System.println("calsArray " + calsArray);
   app.setProperty(PROPERTY_CALS_ARRAY_END_POS_KEY, calsArrayEndPos);
   app.setProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY, calsArrayEndTime);
   app.setProperty(PROPERTY_CALS_ARRAY_KEY, calsArray);
-  app.saveProperties();
 }
 
 /* ****************************************************************************
@@ -751,7 +751,7 @@ var UserHeight = 0;
 var EERCalsPerMinute = 0;
 
 function initEERCals () {
-  var currentYear = (Time.now().value() / Time.Gregorian.SECONDS_PER_YEAR) + 1970;
+  var currentYear = ((Time.now().value() + TIME_ZONE_OFFSET) / Time.Gregorian.SECONDS_PER_YEAR) + 1970;
   UserAge = currentYear - userProfile.birthYear; // years
   UserWeight = userProfile.weight / 1000.0; // kg
   UserHeight = userProfile.height / 100.0; // meters
@@ -799,10 +799,8 @@ function updateCallsArray (currentTimeMinute) {
   if (currentTimeMinute != updateCallsArray_lastMinute) { // do only when 1 minute has passed
     updateCallsArray_lastMinute = currentTimeMinute;
 
-    var nowMinutes = Time.now().value() / 60;
-    var startTodayMinutes = Time.today().value() / 60;
-
-    if (nowMinutes == startTodayMinutes) { // means it is the first minute of the day
+    var nowMinutes = (Time.now().value() + TIME_ZONE_OFFSET) / 60; // UTC time
+    if (nowMinutes == START_TODAY_MINUTES) { // means it is the first minute of the day
       todayCalories = 0; // reset the calories value at midnight
     }
 
@@ -818,7 +816,7 @@ function updateCallsArray (currentTimeMinute) {
 
     var HRSample = HRSensorHistoryIterator.next();
     if (HRSample != null) {
-      date = (HRSample.when.value() + GARMIN_UTC_OFFSET) / 60;
+      date = (HRSample.when.value() + GARMIN_UTC_OFFSET + TIME_ZONE_OFFSET) / 60;
 
       if ((date < nowMinutes) && (date >= (nowMinutes-1))) { // get HR values that are only on the last minute
 	if (HRSample.data != null) {
