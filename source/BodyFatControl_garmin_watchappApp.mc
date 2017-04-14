@@ -1,4 +1,5 @@
 using Toybox.Application as App;
+using Toybox.SensorHistory as SensorHistory;
 
 class BodyFatControl extends App.AppBase {
 
@@ -8,13 +9,13 @@ class BodyFatControl extends App.AppBase {
 
     // onStart() is called on application start up
     function onStart(state) {
-      initEERCals();
-      initStorage();
+      initEERCals ();
+      initPersistentData ();
     }
 
     // onStop() is called when your application is exiting
     function onStop(state) {
-      saveStorage();
+      savePersistentData ();
     }
 
     // Return the initial view of your application here

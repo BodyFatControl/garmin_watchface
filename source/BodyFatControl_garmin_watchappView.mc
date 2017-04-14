@@ -8,6 +8,7 @@ using Toybox.SensorHistory as SensorHistory;
 using Toybox.Time as Time;
 using Toybox.UserProfile as UserProfile;
 using Toybox.Application as App;
+using Toybox.Attention as Attention;
 
 var phoneMethod;
 var commListener = new CommListener();
@@ -16,7 +17,8 @@ var timer1 = new Timer.Timer();
 var HR_value = 0;
 var HRSensorEnable = false;
 var sport_mode = false;
-const SPORT_MODE_MIN_TIME = 60; // in seconds
+var sport_mode_manual = false;
+const SPORT_MODE_MIN_TIME = 90; // in seconds
 var onSensorHRCounter = SPORT_MODE_MIN_TIME;
 var last_minute = -99;
 const DISPLAY_HEIGHT_OFFSET = 57;
@@ -69,18 +71,10 @@ var calsArray = null;
 var calsArrayEndPos = 0;
 var calsArrayEndTime = 0;
 
-
-var onlyOnce = 0;
-
-// Seems a Garmin bug, because UTC time is UTC 00:00 Dec 31 1989
-//Unix UTC time: 1 January 1970
-//Garmin UTC time: 31 December 1989
-const GARMIN_UTC_OFFSET = ((1990 - 1970) * Time.Gregorian.SECONDS_PER_YEAR) - Time.Gregorian.SECONDS_PER_DAY;
-
 const TIME_ZONE_OFFSET = Sys.getClockTime().timeZoneOffset;
-const START_TODAY_MINUTES = (Time.today().value() + TIME_ZONE_OFFSET) / 60; // UTC time
+var START_TODAY_MINUTES = (Time.today().value() + TIME_ZONE_OFFSET) / 60; // UTC time + time zone
 
-const CUSTOM_FONT = false; // true to use the customFont but code needs to be built on Windows only :-(
+const CUSTOM_FONT = true; // true to use the customFont but code needs to be built on Windows only :-(
 
 function CalcHRZones() {
   zone_HR_max = 220 - UserAge; // HRMax = 220 - UserAge
@@ -93,28 +87,58 @@ function onSensorHR(sensor_info)
 {
   if (onSensorHRCounter > 0) { onSensorHRCounter--; }
 
-  var HR = sensor_info.heartRate;
+  var HR = sensor_info.heartRate; // get the current HR value
   if(HR == null) {
     HR_value = 0;
   } else {
     HR_value = HR;
   }
 
-  if (onSensorHRCounter > 0) {
+  if (onSensorHRCounter > 0) { // continue in sport mode, not timeout yet
     sport_mode = true;
-  } else if (HR_value < 90){
-    sport_mode = false;
-    disableHRSensor();
-  } else {
+  } else if (HR_value < 90) { // stop the sport mode, HR lower than 90
+    stopSportMode();
+  } else {  // continue in sport mode, HR still higher or equal than 90
     sport_mode = true;
   }
 
-  if (HR_value >= 90) {
+  if (HR_value >= 90) { // continue in sport mode, HR still higher or equal than 90, reset the counter for timeout
     sport_mode = true;
     onSensorHRCounter = SPORT_MODE_MIN_TIME;
   }
 
   Ui.requestUpdate();
+}
+
+function startSportMode() {
+  if (sport_mode == false) {
+    sport_mode = true;
+    onSensorHRCounter = SPORT_MODE_MIN_TIME;
+    enableHRSensor();
+
+    var vibrateData = [
+	new Attention.VibeProfile(  25, 100 ),
+	new Attention.VibeProfile(  50, 100 ),
+	new Attention.VibeProfile(  75, 100 ),
+	new Attention.VibeProfile(  100, 100 )
+	];
+    Attention.vibrate(vibrateData);
+  }
+}
+
+function stopSportMode() {
+  if (sport_mode == true) {
+    sport_mode = false;
+    disableHRSensor();
+
+    var vibrateData = [
+	new Attention.VibeProfile(  100, 100 ),
+	new Attention.VibeProfile(  75, 100 ),
+	new Attention.VibeProfile(  50, 100 ),
+	new Attention.VibeProfile(  25, 100 )
+	];
+    Attention.vibrate(vibrateData);
+  }
 }
 
 function enableHRSensor() {
@@ -141,10 +165,9 @@ function onPhone(msg) {
     // Execute the command
     if (msg.data[0] == HISTORIC_CALS_COMMAND) {
       dataArray.add(HISTORIC_CALS_COMMAND);
-      var date = (Time.now().value() + // current value in seconds
-	  TIME_ZONE_OFFSET) // add time zone offset from UTC time
-	  / 60; // convert the date from seconds to minutes
+      var date = calsArrayEndTime; // date from last minute stored in calsArray
       dataArray.add(date);
+      dataArray.add(EERCalsPerMinute);
       var startDate = msg.data[1]; // date comes already in minutes
       if (startDate < (date - CALS_ARRAY_SIZE)) { startDate = date - CALS_ARRAY_SIZE; }
       var count = date - startDate;
@@ -173,7 +196,6 @@ function onPhone(msg) {
       dataArray.add(userProfile.height);
       dataArray.add(userProfile.weight);
       dataArray.add(userProfile.activityClass);
-      dataArray.add(EERCalsPerMinute);
       // Transmit command response
       sendCommBusy = true;
       Comm.transmit(dataArray, null, commListener);
@@ -298,32 +320,6 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
     var hourHandAngle;
     var minuteHandAngle;
     var secondHandAngle;
-
-    if (onlyOnce == 0) {
-      onlyOnce = 1;
-//	initStorage();
-
-      // ****************************************************************************
-      // THIS piece of code would run at the end of initStorage(); but watchdog kicks in so run after here to avoid watchdog
-      // Now calc the calories of today up to current date
-      var nowMinutes1 = (Time.now().value() + TIME_ZONE_OFFSET) / 60; // UTC time
-      var enPosMinutes = nowMinutes1 - START_TODAY_MINUTES;
-      System.println("enPosMinutes " + enPosMinutes);
-      var index = calsArrayEndPos;
-      while (enPosMinutes != 0) { // loop over all the values of calsArray between midnight and now
-	enPosMinutes--;
-
-	if (calsArray[index] != null) {
-	  todayCalories += calsArray[index];
-	}
-	if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
-	else { index--; }
-      }
-      // ****************************************************************************
-
-      caloriesBalanceScale = ((EERCalsPerMinute/1000) * 60 * 24) * 0.4;
-      caloriesBalanceScale = caloriesBalanceScale.toNumber();
-    }
 
     width = dc.getWidth();
     height = dc.getHeight() - DISPLAY_HEIGHT_OFFSET;
@@ -556,8 +552,8 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
 
   function onBack() {
     if (sport_mode == true) { // exit the sport mode
-      sport_mode = false;
-      disableHRSensor();
+      sport_mode_manual = false;
+      stopSportMode();
       Ui.requestUpdate();
       return true;
     } else {
@@ -567,10 +563,9 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
 
   function onKey(evt) {
     var key = evt.getKey();
-    if (key == KEY_ENTER) {
-      // Start the sport mode
-      onSensorHRCounter = SPORT_MODE_MIN_TIME;
-      enableHRSensor();
+    if (key == KEY_ENTER) {  // start the sport mode
+      sport_mode_manual = true;
+      startSportMode();
     }
 
     return true;
@@ -594,16 +589,15 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
  *
  */
 
-function initStorage () {
+function initPersistentData () {
   var calsPerMinute = 0;
-  var nowMinutes = (Time.now().value() + TIME_ZONE_OFFSET) / 60;
+  var nowMinutes = (Time.now().value() + TIME_ZONE_OFFSET) / 60; // UTC time + zone offset
   var minutesLeftInArray = 0;
 
   // Initialize var from the values on store object
   var app = App.getApp();
   calsArray = app.getProperty(PROPERTY_CALS_ARRAY_KEY);
-//app.clearProperties();
-//calsArray = null;
+
   if (calsArray == null) { // should happen only on the very first time the app runs
     calsArray = new [CALS_ARRAY_SIZE];
     calsArrayEndPos = CALS_ARRAY_SIZE - 1;
@@ -619,27 +613,11 @@ function initStorage () {
 
       calsArray[calsArrayEndPos] = EERCalsPerMinute; // populate with EERCalsPerMinute
     }
-
-    // ****************************************************************************
-    // Now calc the calories of today up to current date
-    var START_TODAY_MINUTES = (Time.today().value() + TIME_ZONE_OFFSET) / 60;
-    var enPosMinutes = nowMinutes - START_TODAY_MINUTES;
-
-    var index = calsArrayEndPos;
-    while (enPosMinutes) { // loop over all the values of calsArray between midnight and now
-      enPosMinutes--;
-
-      if (calsArray[index] != null) {
-	todayCalories += calsArray[index];
-      }
-      if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
-      else { index--; }
-    }
   } else {
     calsArrayEndPos = app.getProperty(PROPERTY_CALS_ARRAY_END_POS_KEY);
     calsArrayEndTime = app.getProperty(PROPERTY_CALS_ARRAY_END_TIME_KEY);
-//    minutesLeftInArray = nowMinutes - calsArrayEndTime;
-    minutesLeftInArray = (nowMinutes - calsArrayEndTime) - 1; // -1 to try avoid a bug where about 2 cals are always added at start of the app, when HR > 90
+    minutesLeftInArray = nowMinutes - calsArrayEndTime;
+//    minutesLeftInArray = (nowMinutes - calsArrayEndTime) - 1; // -1 to try avoid a bug where about 2 cals are always added at start of the app, when HR > 90
 
     if (minutesLeftInArray > 0) { // need to update the array
       if (minutesLeftInArray > CALS_ARRAY_SIZE) { minutesLeftInArray = CALS_ARRAY_SIZE; } // limit to max array size
@@ -660,7 +638,7 @@ function initStorage () {
       do {
 	HRSample = HRSensorHistoryIterator.next();
 	if (HRSample != null) {
-	  date = (HRSample.when.value() + GARMIN_UTC_OFFSET + TIME_ZONE_OFFSET) / 60;
+	  date = (HRSample.when.value() + TIME_ZONE_OFFSET) / 60; // UTC time + zone offset
 	} else { // no more samples
 	  break;
 	}
@@ -673,18 +651,15 @@ function initStorage () {
 
 	// **********************************************************
 	// get the new values of calories and put on the array
+	HR = 0;
 	if (HRSample != null) {
-	  date = (HRSample.when.value() + GARMIN_UTC_OFFSET + TIME_ZONE_OFFSET) / 60;
-	  if ((date >= targetMinute) && (date < (targetMinute+1))) { // get HR values that are only on this minute
+	  date = (HRSample.when.value() + TIME_ZONE_OFFSET) / 60; // UTC time + zone offset
+	  if (date == targetMinute) { // get HR values that are only on this minute
 	    if (HRSample.data != null) {
 	      HR = HRSample.data;
 	      HRSample = HRSensorHistoryIterator.next();
-	    } else {
-	      HR = 0;
 	    }
 	  }
-	} else { // no more data from SensorHistory
-	  HR = 0;
 	}
 
 	// Manage the array pointer bondaries
@@ -697,12 +672,32 @@ function initStorage () {
 	targetMinute++;
       }
     }
-
-    calsArrayEndTime--;
   }
+
+  // ****************************************************************************
+  // THIS piece of code would run at the end of initStorage(); but watchdog kicks in so run after here to avoid watchdog
+  // Now calc the calories of today up to current date
+  var enPosMinutes = nowMinutes - START_TODAY_MINUTES;
+  var index = calsArrayEndPos;
+
+  while (enPosMinutes != 0) { // loop over all the values of calsArray between midnight and now
+    enPosMinutes--;
+
+    if (calsArray[index] != null) {
+      todayCalories += calsArray[index];
+    }
+    if (index == 0) { index = CALS_ARRAY_SIZE - 1; }
+    else { index--; }
+  }
+  // ****************************************************************************
+
+  calsArrayEndTime--;
+
+  caloriesBalanceScale = ((EERCalsPerMinute/1000) * 60 * 24) * 0.4;
+  caloriesBalanceScale = caloriesBalanceScale.toNumber();
 }
 
-function saveStorage () {
+function savePersistentData () {
    // Save now the values on store object
   var app = App.getApp();
   app.setProperty(PROPERTY_CALS_ARRAY_END_POS_KEY, calsArrayEndPos);
@@ -799,9 +794,11 @@ function updateCallsArray (currentTimeMinute) {
   if (currentTimeMinute != updateCallsArray_lastMinute) { // do only when 1 minute has passed
     updateCallsArray_lastMinute = currentTimeMinute;
 
-    var nowMinutes = (Time.now().value() + TIME_ZONE_OFFSET) / 60; // UTC time
-    if (nowMinutes == START_TODAY_MINUTES) { // means it is the first minute of the day
+    var nowMinutes = (Time.now().value() + TIME_ZONE_OFFSET) / 60;  // UTC time + zone offset
+    if (nowMinutes == START_TODAY_MINUTES + 24*60) { // means it is the first minute of the day
       todayCalories = 0; // reset the calories value at midnight
+      initEERCals();
+      START_TODAY_MINUTES = (Time.today().value() + TIME_ZONE_OFFSET) / 60; // UTC time + time zone
     }
 
     var date = 0;
@@ -815,16 +812,15 @@ function updateCallsArray (currentTimeMinute) {
 	});
 
     var HRSample = HRSensorHistoryIterator.next();
+    HR = 0;
     if (HRSample != null) {
-      date = (HRSample.when.value() + GARMIN_UTC_OFFSET + TIME_ZONE_OFFSET) / 60;
+      date = (HRSample.when.value() + TIME_ZONE_OFFSET) / 60; // UTC time + zone offset
 
-      if ((date < nowMinutes) && (date >= (nowMinutes-1))) { // get HR values that are only on the last minute
+      if (date == (nowMinutes - 1)) { // get HR values that are only from the last minute
 	if (HRSample.data != null) {
 	  HR = HRSample.data;
 	}
       }
-    } else { // no more data from SensorHistory
-      HR = 0;
     }
 
     // Manage the array pointer bondaries
@@ -835,27 +831,12 @@ function updateCallsArray (currentTimeMinute) {
     calsArrayEndTime++;
 
     todayCalories += calsArray[calsArrayEndPos];
+
+    // Start/stop automatically sport mode if was not previously manualy activated
+    if (sport_mode_manual == false) {
+      if (calsArray[calsArrayEndPos] > EERCalsPerMinute) { // start the sport mode
+	startSportMode();
+      }
+    }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
