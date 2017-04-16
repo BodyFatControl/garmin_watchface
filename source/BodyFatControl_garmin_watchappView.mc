@@ -295,18 +295,14 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
 
   // Draw the hash mark symbols on the watch
   function drawHashMarks(dc) {
-    var width = dc.getWidth();
-    var height = dc.getHeight() - DISPLAY_HEIGHT_OFFSET;
-    var coords = [0, width / 4, (3 * width) / 4, width];
-
-    for (var i = 0; i < coords.size(); i += 1) {
-      var dx = ((width / 2.0) - coords[i]) / (height / 2.0);
-      var upperX = coords[i] + (dx * 10);
-      // Draw the upper hash marks
-      dc.fillPolygon([[coords[i] - 1, 2], [upperX - 1, 12], [upperX + 1, 12], [coords[i] + 1, 2]]);
-      // Draw the lower hash marks
-      dc.fillPolygon([[coords[i] - 1, height-2], [upperX - 1, height - 12], [upperX + 1, height - 12], [coords[i] + 1, height - 2]]);
-    }
+    dc.fillPolygon([[109,12], [116,0], [118,0], [111,12]]); // 1
+    dc.fillPolygon([[135,38], [147,31], [149,31], [137,38]]); // 2
+    dc.fillPolygon([[135,110], [147,117], [149,117], [137,110]]); // 4
+    dc.fillPolygon([[109,136], [116,148], [118,148], [111,136]]); // 5
+    dc.fillPolygon([[37,136], [30,148], [32,148], [39,136]]); // 7
+    dc.fillPolygon([[11,110], [-1,117], [1,117], [13,110]]); // 8
+    dc.fillPolygon([[11,38], [-1,31], [1,31], [13,38]]); // 10
+    dc.fillPolygon([[37,12], [30,0], [32,0], [39,12]]); // 11
   }
 
   // Update the view
@@ -427,8 +423,6 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
 	  dc.drawText((screenWidth / 2), (screenHeight - (DISPLAY_HEIGHT_OFFSET - 8)), customFont, "---", Gfx.TEXT_JUSTIFY_CENTER);
 	}
       }
-
-//    } else if (clockTime.min != last_minute) {
     } else {
       last_minute = clockTime.min;
 
