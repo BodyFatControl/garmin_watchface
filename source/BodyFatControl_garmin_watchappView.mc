@@ -18,6 +18,7 @@ var HR_value = 0;
 var HRSensorEnable = false;
 var sport_mode = false;
 var sport_mode_manual = false;
+var sport_mode_disabled_manually = false;
 const SPORT_MODE_MIN_TIME = 90; // in seconds
 var onSensorHRCounter = SPORT_MODE_MIN_TIME;
 var last_minute = -99;
@@ -113,17 +114,18 @@ function onSensorHR(sensor_info)
 function startSportMode() {
   if (sport_mode == false) {
     sport_mode = true;
-    onSensorHRCounter = SPORT_MODE_MIN_TIME;
     enableHRSensor();
 
     var vibrateData = [
-	new Attention.VibeProfile(  25, 100 ),
-	new Attention.VibeProfile(  50, 100 ),
-	new Attention.VibeProfile(  75, 100 ),
-	new Attention.VibeProfile(  100, 100 )
-	];
+        new Attention.VibeProfile(  25, 100 ),
+        new Attention.VibeProfile(  50, 100 ),
+        new Attention.VibeProfile(  75, 100 ),
+        new Attention.VibeProfile(  100, 100 )
+        ];
     Attention.vibrate(vibrateData);
   }
+
+  onSensorHRCounter = SPORT_MODE_MIN_TIME;
 }
 
 function stopSportMode() {
@@ -131,13 +133,15 @@ function stopSportMode() {
     sport_mode = false;
     disableHRSensor();
 
-    var vibrateData = [
-	new Attention.VibeProfile(  100, 100 ),
-	new Attention.VibeProfile(  75, 100 ),
-	new Attention.VibeProfile(  50, 100 ),
-	new Attention.VibeProfile(  25, 100 )
-	];
-    Attention.vibrate(vibrateData);
+    if (sport_mode_disabled_manually == false) { // vibrate only while on sport mode display
+      var vibrateData = [
+	  new Attention.VibeProfile(  100, 100 ),
+	  new Attention.VibeProfile(  75, 100 ),
+	  new Attention.VibeProfile(  50, 100 ),
+	  new Attention.VibeProfile(  25, 100 )
+	  ];
+      Attention.vibrate(vibrateData);
+    }
   }
 }
 
@@ -321,12 +325,12 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
     height = dc.getHeight() - DISPLAY_HEIGHT_OFFSET;
 
     // Clear the screen
-    if (sport_mode == false) {dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);}
+    if ((sport_mode == false) || (sport_mode_disabled_manually == true)) {dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_BLACK);}
     else {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_WHITE);}
     dc.fillRectangle(0, 0, screenWidth, screenHeight);
 
     // Draw lowest rectangle
-    if (sport_mode == false) {
+    if ((sport_mode == false) || (sport_mode_disabled_manually == true)) {
  	  dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
 	  dc.fillRectangle(0, screenHeight - DISPLAY_HEIGHT_OFFSET, screenWidth, screenHeight);
 	} else {
@@ -335,7 +339,7 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
 	}
     
     // Draw the numbers
-    if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);}
+    if ((sport_mode == false) || (sport_mode_disabled_manually == true)) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);}
     else {dc.setColor(COLOR_GRAY_1, Gfx.COLOR_TRANSPARENT);}
     dc.drawText((width / 2), 0, font, "12", Gfx.TEXT_JUSTIFY_CENTER);
     dc.drawText(width - 2, (height / 2) - 15, font, "3", Gfx.TEXT_JUSTIFY_RIGHT);
@@ -356,12 +360,12 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
     drawMinutesHand(dc, minuteHandAngle);
 
     // Draw the arbor
-    if (sport_mode == false) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);}
+    if ((sport_mode == false) || (sport_mode_disabled_manually == true)) {dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);}
     else {dc.setColor(COLOR_GRAY_1, Gfx.COLOR_TRANSPARENT);}
     dc.fillCircle(width / 2, height / 2, 5);
     dc.drawCircle(width / 2, height / 2, 5);
 
-    if (sport_mode == true) {
+    if ((sport_mode == true) && (sport_mode_disabled_manually == false)) {
       /********************************************/
       // Draw HR zones graphs
       //
@@ -545,9 +549,8 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
   }
 
   function onBack() {
-    if (sport_mode == true) { // exit the sport mode
-      sport_mode_manual = false;
-      stopSportMode();
+    if (sport_mode == true) { // signal that sport mode was disabled manually
+      sport_mode_disabled_manually = true;
       Ui.requestUpdate();
       return true;
     } else {
@@ -558,8 +561,10 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
   function onKey(evt) {
     var key = evt.getKey();
     if (key == KEY_ENTER) {  // start the sport mode
+      sport_mode_disabled_manually = false;
       sport_mode_manual = true;
       startSportMode();
+      Ui.requestUpdate();
     }
 
     return true;
@@ -830,6 +835,7 @@ function updateCallsArray (currentTimeMinute) {
     if (sport_mode_manual == false) {
       if (calsArray[calsArrayEndPos] > EERCalsPerMinute) { // start the sport mode
 	startSportMode();
+	sport_mode_disabled_manually = false;
       }
     }
   }
