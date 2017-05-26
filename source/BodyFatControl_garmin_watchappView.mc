@@ -549,7 +549,7 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
   }
 
   function onBack() {
-    if (sport_mode == true) { // signal that sport mode was disabled manually
+    if ((sport_mode == true) && (sport_mode_disabled_manually == false)) { // signal that sport mode was disabled manually
       sport_mode_disabled_manually = true;
       Ui.requestUpdate();
       return true;
