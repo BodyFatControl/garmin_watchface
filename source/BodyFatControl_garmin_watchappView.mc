@@ -561,10 +561,10 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
   function onKey(evt) {
     var key = evt.getKey();
     if (key == KEY_ENTER) {  // start the sport mode
-//      sport_mode_disabled_manually = false;
-//      sport_mode_manual = true;
-//      startSportMode();
-//      Ui.requestUpdate();
+      sport_mode_disabled_manually = false;
+      sport_mode_manual = true;
+      startSportMode();
+      Ui.requestUpdate();
     }
 
     return true;
@@ -832,11 +832,11 @@ function updateCallsArray (currentTimeMinute) {
     todayCalories += calsArray[calsArrayEndPos];
 
     // Start/stop automatically sport mode if was not previously manualy activated
-//    if (sport_mode_manual == false) {
-//      if (calsArray[calsArrayEndPos] > EERCalsPerMinute) { // start the sport mode
-//	startSportMode();
-//	sport_mode_disabled_manually = false;
-//      }
-//    }
+    if (sport_mode_manual == false) {
+      if (calsArray[calsArrayEndPos] > EERCalsPerMinute) { // start the sport mode
+	startSportMode();
+	sport_mode_disabled_manually = false;
+      }
+    }
   }
 }
