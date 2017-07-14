@@ -1,5 +1,6 @@
 using Toybox.Application as App;
 using Toybox.SensorHistory as SensorHistory;
+using Toybox.Communications as Comm;
 
 class BodyFatControl extends App.AppBase {
 
@@ -11,6 +12,10 @@ class BodyFatControl extends App.AppBase {
     function onStart(state) {
       initEERCals ();
       initPersistentData ();
+
+      // Enable communications
+      phoneMethod = method(:onPhone);
+      Comm.registerForPhoneAppMessages(phoneMethod);
     }
 
     // onStop() is called when your application is exiting

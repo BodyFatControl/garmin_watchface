@@ -132,14 +132,12 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
   function initialize() {
     View.initialize();
 
-    // Enable communications
-    phoneMethod = method(:onPhone);
-    Comm.registerForPhoneAppMessages(phoneMethod);
-
     CalcHRZones();
 
     if (CUSTOM_FONT == true) {
-      customFont = Ui.loadResource(Rez.Fonts.roboto_bold_36);
+//      customFont = Ui.loadResource(Rez.Fonts.roboto_bold_36);
+	customFont = Graphics.FONT_LARGE;
+
     } else {
       customFont = Graphics.FONT_LARGE;
     }
