@@ -77,6 +77,8 @@ var START_TODAY_MINUTES = (Time.today().value() + TIME_ZONE_OFFSET) / 60; // UTC
 
 const CUSTOM_FONT = true; // true to use the customFont but code needs to be built on Windows only :-(
 
+var bodyFatControl;
+
 function CalcHRZones() {
   zone_HR_max = 220 - UserAge; // HRMax = 220 - UserAge
   zone_HR_min = zone_HR_max / 2;
@@ -84,37 +86,10 @@ function CalcHRZones() {
   zone_HR_m_calc = (148.0 - INDICATOR_WIDTH) / (zone_HR_max - zone_HR_min); // screenWidth = 148 on VivoActive HR
 }
 
-function onSensorHR(sensor_info)
-{
-  if (onSensorHRCounter > 0) { onSensorHRCounter--; }
-
-  var HR = sensor_info.heartRate; // get the current HR value
-  if(HR == null) {
-    HR_value = 0;
-  } else {
-    HR_value = HR;
-  }
-
-  if (onSensorHRCounter > 0) { // continue in sport mode, not timeout yet
-    sport_mode = true;
-  } else if (HR_value < 90) { // stop the sport mode, HR lower than 90
-    stopSportMode();
-  } else {  // continue in sport mode, HR still higher or equal than 90
-    sport_mode = true;
-  }
-
-  if (HR_value >= 90) { // continue in sport mode, HR still higher or equal than 90, reset the counter for timeout
-    sport_mode = true;
-    onSensorHRCounter = SPORT_MODE_MIN_TIME;
-  }
-
-  Ui.requestUpdate();
-}
-
 function startSportMode() {
   if (sport_mode == false) {
     sport_mode = true;
-    enableHRSensor();
+    bodyFatControl.enableHRSensor();
 
     var vibrateData = [
         new Attention.VibeProfile(  25, 100 ),
@@ -126,37 +101,6 @@ function startSportMode() {
   }
 
   onSensorHRCounter = SPORT_MODE_MIN_TIME;
-}
-
-function stopSportMode() {
-  if (sport_mode == true) {
-    sport_mode = false;
-    disableHRSensor();
-
-    if (sport_mode_disabled_manually == false) { // vibrate only while on sport mode display
-      var vibrateData = [
-	  new Attention.VibeProfile(  100, 100 ),
-	  new Attention.VibeProfile(  75, 100 ),
-	  new Attention.VibeProfile(  50, 100 ),
-	  new Attention.VibeProfile(  25, 100 )
-	  ];
-      Attention.vibrate(vibrateData);
-    }
-  }
-}
-
-function enableHRSensor() {
-  if (HRSensorEnable == false) {
-    Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE]);
-    Sensor.enableSensorEvents(method(:onSensorHR));
-    HRSensorEnable = true;
-  }
-}
-
-function disableHRSensor() {
-  Sensor.setEnabledSensors([]);
-  Sensor.enableSensorEvents();
-  HRSensorEnable = false;
 }
 
 /*******************************************************
@@ -225,9 +169,7 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
   function initialize() {
     View.initialize();
 
-    // Enable communications
-    phoneMethod = method(:onPhone);
-    Comm.registerForPhoneAppMessages(phoneMethod);
+    bodyFatControl = new BodyFatControl ();
 
     CalcHRZones();
 
@@ -503,6 +445,28 @@ class BodyFatControl_garmin_watchappView extends Ui.View {
 
     updateCallsArray(clockTime.min);
   }
+
+  function disableHRSensor() {
+    Sensor.setEnabledSensors([]);
+    HRSensorEnable = false;
+  }
+
+  function stopSportMode() {
+    if (sport_mode == true) {
+      sport_mode = false;
+      disableHRSensor();
+
+      if (sport_mode_disabled_manually == false) { // vibrate only while on sport mode display
+        var vibrateData = [
+  	  new Attention.VibeProfile(  100, 100 ),
+  	  new Attention.VibeProfile(  75, 100 ),
+  	  new Attention.VibeProfile(  50, 100 ),
+  	  new Attention.VibeProfile(  25, 100 )
+  	  ];
+        Attention.vibrate(vibrateData);
+      }
+    }
+  }
 }
 
 class CommListener extends Comm.ConnectionListener {
@@ -563,7 +527,7 @@ class BaseInputDelegate extends Ui.BehaviorDelegate {
     if (key == KEY_ENTER) {  // start the sport mode
       sport_mode_disabled_manually = false;
       sport_mode_manual = true;
-      startSportMode();
+      bodyFatControl.startSportMode();
       Ui.requestUpdate();
     }
 
